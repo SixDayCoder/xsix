@@ -1,8 +1,24 @@
 #pragma once
 
 #include <stdint.h>
+#include <assert.h>
 
 
+//assert define
+namespace xsix
+{
+	#define XASSERT(expression) assert(expression)
+}
+
+//memory define
+namespace xsix
+{
+	#define XMALLOC  malloc
+	#define XFREE    free
+	#define XREALLOC realloc
+}
+
+//network define
 #if defined(_XSIX_WINDOWS)
 
 #include <WinSock2.h>
