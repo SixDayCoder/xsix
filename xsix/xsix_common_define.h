@@ -19,10 +19,11 @@ namespace xsix
 }
 
 //network define
+//<WinSock2.h> must head of <Windows.h>
 #if defined(_XSIX_WINDOWS)
-
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+#include <Windows.h>
 namespace xsix
 {
 	using Sockfd = SOCKET;
@@ -42,4 +43,13 @@ namespace xsix
 	using Sockfd = int32_t;
 }
 
+#endif
+
+
+//file define
+#if defined(_XSIX_WINDOWS)
+#include <io.h>
+#include <direct.h>
+#include <ShlObj.h>
+#elif defined(_XSIX_LINUX)
 #endif
