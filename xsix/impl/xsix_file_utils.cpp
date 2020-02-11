@@ -1,6 +1,7 @@
 #include "xsix/xsix_file_utils.h"
 #include "xsix/xsix_string_utils.h"
 #include <algorithm>
+#include <fstream>
 
 namespace xsix
 {
@@ -183,19 +184,28 @@ namespace xsix
 		return false;
 	}
 
-	bool FileUtils::Touch(const std::string& szPath)
+	bool FileUtils::CreateFileEx(const std::string& szPath)
 	{
-		return false;
+		std::string szStdPath = GetStdPath(szPath);
+		std::fstream file;
+		file.open(szStdPath.c_str(), std::ios::out);
+		if (!file)
+		{
+			return false;
+		}
+		file.close();
+		return true;
 	}
 
-	bool FileUtils::Remove(const std::string& szPath)
+	bool FileUtils::DeleteFileEx(const std::string& szPath)
 	{
-		return false;
-	}
-
-	bool FileUtils::Copy(const std::string& src, const std::string& dst)
-	{
-		return false;
+		std::string szStdPath = GetStdPath(szPath);
+		if (!IsPathExists(szStdPath))
+		{
+			return true;
+		}
+		int32_t nRet = remove(szStdPath.c_str());
+		return nRet == 0 ? true : false;
 	}
 
 }

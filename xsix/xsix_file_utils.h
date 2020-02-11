@@ -26,10 +26,8 @@ namespace xsix
 
 		static bool Mkdirs(const std::string& szPath);
 
-		static bool Touch(const std::string& szPath);
+		static bool CreateFileEx(const std::string& szPath);
 
-		static bool Remove(const std::string& szPath);
-
-		static bool Copy(const std::string& src, const std::string& dst);
+		static bool DeleteFileEx(const std::string& szPath);
 	};
 }
