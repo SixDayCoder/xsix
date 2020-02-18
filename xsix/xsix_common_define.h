@@ -3,53 +3,24 @@
 #include <stdint.h>
 #include <assert.h>
 
+//platform define
+#if ( defined(WIN32) || defined(WIN64) )
+	#ifndef _XSIX_WINDOWS
+		#define _XSIX_WINDOWS
+	#endif
+#endif
 
-//assert define
+#if defined _XSIX_WINDOWS
+	#pragma warning(disable:4996)
+#endif
+
 namespace xsix
 {
+	//assert define
 	#define XASSERT(expression) assert(expression)
-}
 
-//memory define
-namespace xsix
-{
+	//memory define
 	#define XMALLOC  malloc
 	#define XFREE    free
 	#define XREALLOC realloc
 }
-
-//network define
-//<WinSock2.h> must head of <Windows.h>
-#if defined(_XSIX_WINDOWS)
-#include <WinSock2.h>
-#include <WS2tcpip.h>
-#include <Windows.h>
-namespace xsix
-{
-	using Sockfd = SOCKET;
-}
-
-#elif defined(_XSIX_LINUX)
-
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <poll.h>
-#define     INVALID_SOCKET   (-1)
-#define		SOCKET_ERROR	 (-1)
-namespace xsix
-{
-	using Sockfd = int32_t;
-}
-
-#endif
-
-
-//file define
-#if defined(_XSIX_WINDOWS)
-#include <io.h>
-#include <direct.h>
-#include <ShlObj.h>
-#elif defined(_XSIX_LINUX)
-#endif
