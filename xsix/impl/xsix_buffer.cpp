@@ -1,7 +1,11 @@
 #include "xsix/xsix_buffer.h"
+
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <algorithm>
+
 
 namespace xsix
 {

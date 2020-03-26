@@ -5,9 +5,10 @@
 
 namespace xsix
 {
+
+#if   defined(_XSIX_WINDOWS)
 	static bool InnerPathExists_Windows(const std::string& szPath, WIN32_FIND_DATA& FindFileData)
 	{
-#if   defined(_XSIX_WINDOWS)
 		HANDLE hFind;
 		hFind = FindFirstFile(szPath.c_str(), &FindFileData);
 		if (hFind == INVALID_HANDLE_VALUE)
@@ -17,9 +18,8 @@ namespace xsix
 		}
 		FindClose(hFind);
 		return true;
-#endif
-		return false;
 	}
+#endif
 
 	bool FileUtils::IsPathExists(const std::string& szPath)
 	{
@@ -146,15 +146,15 @@ namespace xsix
 
 	bool FileUtils::Mkdirs(const std::string& szPath)
 	{
-		if (szPath.length() > MAX_PATH)
-		{
-			return false;
-		}
 		if (IsDirExists(szPath))
 		{
 			return true;
 		}
 #if   defined(_XSIX_WINDOWS)
+		if (szPath.length() > MAX_PATH)
+		{
+			return false;
+		}
 		std::string szDirPath = GetStdPath(szPath);
 		char szTempPath[MAX_PATH] = { 0 };
 		if (szDirPath[szDirPath.length() - 1] != '/')

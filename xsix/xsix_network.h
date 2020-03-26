@@ -11,12 +11,14 @@
 
 #elif defined(_XSIX_LINUX)
 
+	#include <unistd.h>
 	#include <netdb.h>
 	#include <netinet/in.h>
 	#include <netinet/tcp.h>
 	#include <arpa/inet.h>
 	#include <sys/types.h>
 	#include <sys/socket.h>
+	#include <fcntl.h>
 	#include <poll.h>
 
 	typedef int	SOCKET;

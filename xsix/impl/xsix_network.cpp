@@ -1,6 +1,7 @@
 #include "xsix/xsix_network.h"
 #include "xsix/xsix_string_utils.h"
 #include <stdlib.h>
+#include <string.h>
 
 namespace xsix
 {
@@ -143,7 +144,7 @@ namespace xsix
 		{
 			//TODO:log
 		}
-		return rc < 0 ? : false : true;
+		return rc < 0 ? false : true;
 #endif
 
 		return false;
@@ -182,7 +183,7 @@ namespace xsix
 	{
 		if (bUseIPv6)
 		{
-			SOCKADDR_IN6 addr;
+			sockaddr_in6 addr;
 			memset(&addr, 0, sizeof(addr));
 			addr.sin6_family = AF_INET6;
 			addr.sin6_port = htons(port);
@@ -197,7 +198,7 @@ namespace xsix
 		}
 		else
 		{
-			SOCKADDR_IN addr;
+			sockaddr_in addr;
 			memset(&addr, 0, sizeof(addr));
 			addr.sin_family = AF_INET;
 			addr.sin_port = htons(port);
@@ -334,7 +335,7 @@ namespace xsix
 		XASSERT(addr);
 		sockaddr_storage ss;
 		memset(&ss, 0, sizeof(ss));
-		int32_t len = sizeof(ss);
+		socklen_t len = sizeof(ss);
 		SOCKET fd = accept(m_fd, (sockaddr*)&ss, &len);
 		if (fd == INVALID_SOCKET)
 		{

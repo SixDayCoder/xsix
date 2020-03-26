@@ -1,4 +1,5 @@
 #pragma once
+
 #include "xsix/xsix_common_define.h"
 #include <string>
 
