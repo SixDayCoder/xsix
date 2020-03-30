@@ -28,6 +28,10 @@
 
 #endif
 
+#if defined(_XSIX_LINUX)
+	#include <sys/time.h>
+#endif
+
 namespace xsix
 {
 	inline double utcsecond() 
