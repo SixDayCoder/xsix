@@ -177,7 +177,7 @@ namespace xsix
 				std::string szCurrPath = szDirPath.substr(0, i);
 				if (!IsDirExists(szCurrPath))
 				{
-					if (_mkdir(szTempPath < 0)
+					if (_mkdir(szTempPath.c_str()) < 0)
 					{
 						return false;
 					}
