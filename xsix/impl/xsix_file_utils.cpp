@@ -27,8 +27,7 @@ namespace xsix
 		WIN32_FIND_DATA FindFileData;
 		return InnerPathExists_Windows(szPath, FindFileData);
 #elif defined(_XSIX_LINUX)
-		//TODO:
-		return false;
+		return access(szPath.c_str(), F_OK) == 0 ? true : false;
 #endif
 		return false;
 	}
@@ -47,7 +46,12 @@ namespace xsix
 		}
 		return false;
 #elif defined(_XSIX_LINUX)
-		//TODO:
+		struct stat info;
+		int32_t rc = stat(szPath.c_str(), &info);
+		if(rc == 0)
+		{
+			return !S_ISDIR(info.st_mode);
+		}
 		return false;
 #endif
 		return false;
@@ -67,7 +71,12 @@ namespace xsix
 		}
 		return false;
 #elif defined(_XSIX_LINUX)
-		//TODO:
+				struct stat info;
+		int32_t rc = stat(szPath.c_str(), &info);
+		if(rc == 0)
+		{
+			return S_ISDIR(info.st_mode);
+		}
 		return false;
 #endif
 		return false;
@@ -122,8 +131,9 @@ namespace xsix
 		_getcwd(buffer, MAX_PATH);
 		return std::string(buffer);
 #elif defined(_XSIX_LINUX)
-		//TODO:
-		return "";
+		char buffer[256] = {0};
+		getcwd(buffer, 256);
+		return std::string(buffer);
 #endif
 		return "";
 	}
@@ -156,7 +166,6 @@ namespace xsix
 			return false;
 		}
 		std::string szDirPath = GetStdPath(szPath);
-		char szTempPath[MAX_PATH] = { 0 };
 		if (szDirPath[szDirPath.length() - 1] != '/')
 		{
 			szDirPath.push_back('/');
@@ -165,11 +174,10 @@ namespace xsix
 		{
 			if (szDirPath[i] == '/' && i != 0)
 			{
-				memcpy(szTempPath, szDirPath.c_str(), i);
-				if (!IsDirExists(szTempPath))
+				std::string szCurrPath = szDirPath.substr(0, i);
+				if (!IsDirExists(szCurrPath))
 				{
-					int32_t nRetCode = _mkdir(szTempPath);
-					if (nRetCode != 0)
+					if (_mkdir(szTempPath < 0)
 					{
 						return false;
 					}
@@ -178,8 +186,34 @@ namespace xsix
 		}
 		return true;
 #elif defined(_XSIX_LINUX)
-		//TODO:
-		return false;
+		if (szPath.length() > 256)
+		{
+			return false;
+		}
+		std::string szDirPath = GetStdPath(szPath);
+		if(szDirPath[0] != '/')
+		{
+			szDirPath.insert(0, 1, '/');
+		}
+		if (szDirPath[szDirPath.length() - 1] != '/')
+		{
+			szDirPath.push_back('/');
+		}
+		for (std::size_t i = 0; i < szDirPath.length(); ++i)
+		{
+			if (szDirPath[i] == '/' && i != 0)
+			{
+				std::string szCurrPath = szDirPath.substr(0, i);
+				if(access(szCurrPath.c_str(), F_OK) != 0)
+				{
+					if(mkdir(szCurrPath.c_str(), 0755) < 0)
+					{
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 #endif
 		return false;
 	}

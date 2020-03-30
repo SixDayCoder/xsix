@@ -25,10 +25,11 @@ namespace xsix
 
 	void SocketAPI::LogSocketError()
 	{
-#if   defined (_XSIX_WINDOWS)
-
-		int32_t nErrorCode = WSAGetLastError();
 		std::string szErrorMsg = "UNKNOWN";
+		int32_t nErrorCode = -1;
+
+#if   defined (_XSIX_WINDOWS)
+		nErrorCode = WSAGetLastError();
 		switch (nErrorCode)
 		{
 			_XSIX_SOCK_ERROR_MSG(WSANOTINITIALISED, szErrorMsg);
@@ -64,9 +65,26 @@ namespace xsix
 		default:
 			break;
 		}
-		printf("error_code : %d, error_msg : %s\n", nErrorCode, szErrorMsg.c_str());
+
 #elif defined(_XSIX_LINUX)
+		nErrorCode = errno;
+		switch (nErrorCode)
+		{
+			_XSIX_SOCK_ERROR_MSG(EALREADY, szErrorMsg);
+			_XSIX_SOCK_ERROR_MSG(ECONNABORTED, szErrorMsg);
+			_XSIX_SOCK_ERROR_MSG(ECONNREFUSED, szErrorMsg);
+			_XSIX_SOCK_ERROR_MSG(ECONNRESET, szErrorMsg);
+			_XSIX_SOCK_ERROR_MSG(ETIMEDOUT, szErrorMsg);
+			_XSIX_SOCK_ERROR_MSG(EFAULT, szErrorMsg);
+			_XSIX_SOCK_ERROR_MSG(ENOTSOCK, szErrorMsg);
+			_XSIX_SOCK_ERROR_MSG(EINPROGRESS, szErrorMsg);
+			_XSIX_SOCK_ERROR_MSG(EWOULDBLOCK, szErrorMsg);
+			_XSIX_SOCK_ERROR_MSG(EREMOTE, szErrorMsg);
+		default:
+			break;
+		}
 #endif
+		printf("error_code : %d, error_msg : %s\n", nErrorCode, szErrorMsg.c_str());
 
 	}
 
@@ -142,7 +160,7 @@ namespace xsix
 		int32_t rc = fcntl(fd, F_SETFL, flags);
 		if (rc < 0)
 		{
-			//TODO:log
+			SocketAPI::LogSocketError();
 		}
 		return rc < 0 ? false : true;
 #endif

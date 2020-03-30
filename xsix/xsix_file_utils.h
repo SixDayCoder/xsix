@@ -5,10 +5,18 @@
 
 //file define
 #if defined(_XSIX_WINDOWS)
-#include <io.h>
-#include <direct.h>
-#include <ShlObj.h>
-#elif defined(_XSIX_LINUX)
+
+	#include <io.h>
+	#include <direct.h>
+	#include <ShlObj.h>
+	
+#endif
+
+#if defined(_XSIX_LINUX)
+
+	#include <unistd.h>
+	#include <sys/stat.h>
+	
 #endif
 
 namespace xsix
