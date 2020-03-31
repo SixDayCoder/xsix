@@ -73,22 +73,22 @@ namespace xsix
 		t->tv_usec = (long)(m_ns % Duration::kSecond) / (long)Duration::kMicrosecond;
 	}
 
-	int64_t Timestamp::Unix() const
+	inline int64_t Timestamp::Unix() const
 	{
 		return m_ns / Duration::kSecond;
 	}
 
-	int64_t Timestamp::UnixNano() const
+	inline int64_t Timestamp::UnixNano() const
 	{
 		return m_ns;
 	}
 
-	int64_t Timestamp::UnixMills() const
+	inline int64_t Timestamp::UnixMills() const
 	{
 		return m_ns / Duration::kMilliseoncd;
 	}
 
-	void Timestamp::Add(Duration d)
+	inline void Timestamp::Add(Duration d)
 	{
 		m_ns += d.Nanoseconds();
 	}

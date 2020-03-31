@@ -1,4 +1,5 @@
 #include "xsix/xsix_network.h"
+#include "xsix/xsix_timestamp.h"
 #include <stdio.h>
 
 int main()
@@ -35,6 +36,8 @@ int main()
 				}
 			}
 		}
+		xsix::Timestamp now = xsix::Timestamp::Now();
+		printf("now time : %d\n", now.UnixMills());
 	}
 
 	xsix::NetworkEnv::Clean();
