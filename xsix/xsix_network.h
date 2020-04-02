@@ -94,6 +94,11 @@
 #endif
 
 
+#define XSIX_NETWORK_INIT   xsix::NetworkEnv::Init();
+#define XSIX_NETWORK_CLEAN  xsix::NetworkEnv::Clean();
+
+#define XSIX_DEFAULT_LISTEN_BACKLOG (128)
+
 namespace xsix
 {
 	class NetworkEnv
@@ -200,6 +205,8 @@ namespace xsix
 
 		bool SetTCPNoDelay(bool on);
 
+		bool IsValid() const { return m_fd != INVALID_SOCKET; }
+
 		SOCKET GetSockfd() const { return m_fd; };
 
 		void Close();
@@ -255,7 +262,7 @@ namespace xsix
 
 		bool Bind(uint16_t port);
 
-		bool Listen(int32_t backlog = 128);
+		bool Listen(int32_t backlog = XSIX_DEFAULT_LISTEN_BACKLOG);
 
 		SOCKET Accept(NetAddr* addr);
 

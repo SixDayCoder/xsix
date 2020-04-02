@@ -25,7 +25,12 @@ namespace xsix
 
 	int32_t buffer::Write(const char* src, int32_t size)
 	{
-		XASSERT(src && size > 0);
+		XASSERT(src);
+
+		if (src <= 0)
+		{
+			return 0;
+		}
 
 		if (FreeSize() < size)
 		{
@@ -78,7 +83,7 @@ namespace xsix
 
 	int32_t buffer::Read(char* dst, int32_t size)
 	{
-		if (size == 0 || size > Len())
+		if (size == 0)
 		{
 			return 0;
 		}
@@ -86,6 +91,11 @@ namespace xsix
 		if (Empty())
 		{
 			return 0;
+		}
+
+		if (Len() < size)
+		{
+			size = Len();
 		}
 
 		if (m_nHead < m_nTail)

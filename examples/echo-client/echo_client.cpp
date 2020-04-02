@@ -1,22 +1,20 @@
-#include "xsix/xsix_network.h"
+#include "xsix/xsix_tcp_client.h"
 #include <stdio.h>
 
 int main()
 {
-	xsix::NetworkEnv::Init();
+	XSIX_NETWORK_INIT;
+	
+	xsix::TCPClient client;	
+	XASSERT(client.Connect(xsix::NetAddr("127.0.0.1", 8888)));
+	
+	client.PushSendBytes("hello1", 6);
+	client.PushSendBytes("hello2", 6);
+	client.PushSendBytes("hello3", 6);
+	client.Run();
 
-	xsix::NetAddr addr("127.0.0.1", 8888);
-	xsix::ClientSocket client;
-	printf("client ready connect (%s:%d)\n", addr.IP().c_str(), addr.Port());
-	XASSERT(client.Connect(addr));
-	client.SendBytes("helloxsix", 9);
-	char recv[1024] = { 0 };
-	if (client.RecvBytes(recv, 1024))
-	{
-		printf("receive : %s\n", recv);
-		client.Close();
-	}
-	xsix::NetworkEnv::Clean();
 	getchar();
+
+	XSIX_NETWORK_CLEAN;
 	return 0;
 }
