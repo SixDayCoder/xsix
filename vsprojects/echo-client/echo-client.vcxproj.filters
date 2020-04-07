@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="xsix">
+      <UniqueIdentifier>{a4a8b0ff-46a0-4a92-b962-ed3131bec4ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xsix\impl">
+      <UniqueIdentifier>{072d9d58-c519-4969-b76a-42e3fa1dd142}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\xsix\xsix_bits.hpp">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xsix\xsix_buffer.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xsix\xsix_common_define.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xsix\xsix_file_utils.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xsix\xsix_math_utils.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xsix\xsix_network.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xsix\xsix_string_utils.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xsix\xsix_timestamp.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xsix\xsix_duration.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xsix\xsix_tcp_client.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xsix\xsix_tcp_server.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xsix\xsix_gettimeofday.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\xsix\impl\xsix_buffer.cpp">
+      <Filter>xsix\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xsix\impl\xsix_file_utils.cpp">
+      <Filter>xsix\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xsix\impl\xsix_math_utils.cpp">
+      <Filter>xsix\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xsix\impl\xsix_network.cpp">
+      <Filter>xsix\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xsix\impl\xsix_string_utils.cpp">
+      <Filter>xsix\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\examples\echo-client\echo_client.cpp" />
+    <ClCompile Include="..\..\xsix\impl\xsix_tcp_client.cpp">
+      <Filter>xsix\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xsix\impl\xsix_tcp_server.cpp">
+      <Filter>xsix\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xsix\impl\xsix_duration.cpp">
+      <Filter>xsix\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\xsix\impl\xsix_timestamp.cpp">
+      <Filter>xsix\impl</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
