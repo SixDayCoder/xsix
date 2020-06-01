@@ -6,7 +6,7 @@ namespace xsix
 	bool MathUtils::IsPrimeNumebr(uint64_t n)
 	{
 		uint64_t i = 2;
-		uint64_t sqrtn = static_cast<uint64_t>(std::sqrt(n));
+		uint64_t sqrtn = static_cast<uint64_t>(sqrt(n));
 		for (; i <= sqrtn; ++i)
 		{
 			if (n % i)
