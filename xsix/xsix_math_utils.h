@@ -8,10 +8,11 @@ namespace xsix
 	{
 	public:
 
-		static bool IsPrimeNumebr(uint64_t n);
+		static bool			IsPrimeNumebr(uint64_t n);
 
-		static uint64_t MinPowerOf2(uint64_t n);
+		static bool			IsPowerOf2(uint64_t n);
+			
+		static uint64_t		MinPowerOf2(uint64_t n);
 
-		static bool IsPowerOf2(uint64_t n);
 	};
 }

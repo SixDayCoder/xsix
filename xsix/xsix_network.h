@@ -79,16 +79,6 @@
 	#define SOCKET_ERROR (-1)  
 #endif
 
-
-#ifndef _XSIX_SOCK_ERROR_MSG
-
-	#define _XSIX_SOCK_ERROR_MSG(name, msg) \
-		case name:\
-			msg = #name;\
-			break;
-
-#endif
-
 #if defined(_XSIX_WINDOWS)
 	#pragma comment(lib, "Ws2_32.lib")
 #endif
@@ -96,7 +86,6 @@
 
 #define XSIX_NETWORK_INIT   xsix::NetworkEnv::Init();
 #define XSIX_NETWORK_CLEAN  xsix::NetworkEnv::Clean();
-
 #define XSIX_DEFAULT_LISTEN_BACKLOG (128)
 
 namespace xsix
@@ -114,29 +103,29 @@ namespace xsix
 	{
 	public:
 
-		static void LogSocketError();
+		static void		LogSocketError();
 
-		static void CloseSocket(SOCKET fd);
+		static void		CloseSocket(SOCKET fd);
 
-		static SOCKET CreateSocket(bool bUseIPv6 = false);
+		static SOCKET	CreateSocket(bool bUseIPv6 = false);
 
-		static bool SetNonBlock(SOCKET fd, bool on);
+		static bool		SetNonBlock(SOCKET fd, bool on);
 
-		static bool SetReuseAddr(SOCKET fd);
+		static bool		SetReuseAddr(SOCKET fd);
 
-		static bool SetReusePort(SOCKET fd);
+		static bool		SetReusePort(SOCKET fd);
 
-		static bool SetLinger(SOCKET fd, uint32_t nLingerTime);
+		static bool		SetLinger(SOCKET fd, uint32_t nLingerTime);
 
-		static bool SetTCPNoDelay(SOCKET fd, bool on);
+		static bool		SetTCPNoDelay(SOCKET fd, bool on);
 
-		static bool Bind(SOCKET fd, uint16_t port, bool bUseIPv6 = false);
+		static bool		Bind(SOCKET fd, uint16_t port, bool bUseIPv6 = false);
 
-		static bool Listen(SOCKET fd, int32_t nBacklog);
+		static bool		Listen(SOCKET fd, int32_t nBacklog);
 
-		static int32_t RecvBytes(SOCKET fd, char* buffer, int32_t nCount);
+		static int32_t	RecvBytes(SOCKET fd, char* buffer, int32_t nCount);
 
-		static int32_t SendBytes(SOCKET fd, const char* buffer, int32_t nCount);
+		static int32_t	SendBytes(SOCKET fd, const char* buffer, int32_t nCount);
 
 	};
 
@@ -201,15 +190,15 @@ namespace xsix
 		
 	public:
 
-		bool SetNonBlock(bool on);
+		bool	SetNonBlock(bool on);
 
-		bool SetTCPNoDelay(bool on);
+		bool	SetTCPNoDelay(bool on);
 
-		bool IsValid() const { return m_fd != INVALID_SOCKET; }
+		bool	IsValid() const { return m_fd != INVALID_SOCKET; }
 
-		SOCKET GetSockfd() const { return m_fd; };
+		SOCKET	GetSockfd() const { return m_fd; };
 
-		void Close();
+		void	Close();
 
 	public:
 		
@@ -246,9 +235,7 @@ namespace xsix
 	{
 	public:
 
-		explicit ServerSocket(bool bUseIPv6 = false) : Socket(bUseIPv6) {}
-
-		virtual ~ServerSocket() {}
+		explicit ServerSocket(bool bUseIPv6 = false) : Socket(bUseIPv6), m_Port(0) {}
 
 		ServerSocket(const ServerSocket & other) = delete;
 
@@ -256,15 +243,15 @@ namespace xsix
 
 	public:
 
-		bool SetReusePort();
+		bool	SetReusePort();
 
-		bool SetReuseAddr();
+		bool	SetReuseAddr();
 
-		bool Bind(uint16_t port);
+		bool	Bind(uint16_t port);
 
-		bool Listen(int32_t backlog = XSIX_DEFAULT_LISTEN_BACKLOG);
+		bool	Listen(int32_t backlog = XSIX_DEFAULT_LISTEN_BACKLOG);
 
-		SOCKET Accept(NetAddr* addr);
+		SOCKET	Accept(NetAddr* addr);
 
 	private:
 

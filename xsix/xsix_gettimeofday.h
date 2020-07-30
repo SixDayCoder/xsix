@@ -9,24 +9,24 @@
 #include <WinSock2.h>
 
 
-	#ifndef H_XSIX_WIN32_GETTIMEOFDAY
-	#define H_XSIX_WIN32_GETTIMEOFDAY
-	inline int gettimeofday(struct timeval * tp, void* tzp)
-	{
-		uint64_t  intervals;
-		FILETIME  ft;
+#ifndef H_XSIX_WIN32_GETTIMEOFDAY
+#define H_XSIX_WIN32_GETTIMEOFDAY
+inline int gettimeofday(struct timeval* tp, void* tzp)
+{
+	uint64_t  intervals;
+	FILETIME  ft;
 
-		GetSystemTimeAsFileTime(&ft);
+	GetSystemTimeAsFileTime(&ft);
 
-		intervals = ((uint64_t)ft.dwHighDateTime << 32) | ft.dwLowDateTime;
-		intervals -= 116444736000000000;
+	intervals = ((uint64_t)ft.dwHighDateTime << 32) | ft.dwLowDateTime;
+	intervals -= 116444736000000000;
 
-		tp->tv_sec = (long)(intervals / 10000000);
-		tp->tv_usec = (long)((intervals % 10000000) / 10);
+	tp->tv_sec = (long)(intervals / 10000000);
+	tp->tv_usec = (long)((intervals % 10000000) / 10);
 
-		return 0;
-	}
-	#endif //XSIX_WIN32_GETTIMEOFDAY
+	return 0;
+}
+#endif //XSIX_WIN32_GETTIMEOFDAY
 
 #endif
 

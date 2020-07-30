@@ -4,7 +4,7 @@
 
 namespace xsix
 {
-	class Timestamp 
+	class Timestamp
 	{
 	public:
 
@@ -18,7 +18,7 @@ namespace xsix
 
 		explicit Timestamp(int64_t nanoseconds) : m_ns(nanoseconds) {}
 
-		explicit Timestamp(const struct timeval& t) : m_ns(t.tv_sec * Duration::kSecond + t.tv_usec * Duration::kMicrosecond) {}
+		explicit Timestamp(const struct timeval& t) : m_ns(t.tv_sec* Duration::kSecond + t.tv_usec * Duration::kMicrosecond) {}
 
 		struct timeval TimeVal() const;
 
@@ -36,7 +36,7 @@ namespace xsix
 
 	public:
 
-		bool operator < (const Timestamp& rhs) const  { return m_ns < rhs.m_ns; }
+		bool operator < (const Timestamp& rhs) const { return m_ns < rhs.m_ns; }
 
 		bool operator == (const Timestamp& rhs) const { return m_ns == rhs.m_ns; }
 

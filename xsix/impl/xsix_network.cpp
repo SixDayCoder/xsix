@@ -3,8 +3,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 namespace xsix
 {
+
+	#ifndef _XSIX_SOCK_ERROR_MSG
+	#define _XSIX_SOCK_ERROR_MSG(name, msg) \
+			case name:\
+				msg = #name;\
+				break;
+	#endif
+
 
 	void NetworkEnv::Init()
 	{

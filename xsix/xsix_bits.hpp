@@ -11,22 +11,14 @@ namespace xsix
 
 		enum
 		{
-			BITS_COUNT =  SlotCount,
+			BITS_COUNT = SlotCount,
 			BYTE_COUNT = (BITS_COUNT + 7) / 8
 		};
 
 	public:
 
-		bits()
-		{
-			ClearAll();
-		}
+		bits() { ClearAll(); }
 
-		~bits()
-		{
-
-		}
-	
 	public:
 
 		bits(const bits<SlotCount>& rhs)
@@ -42,9 +34,9 @@ namespace xsix
 			}
 			return *this;
 		}
-		
+
 	public:
-		
+
 		void Set(int32_t nIndex, bool bValue)
 		{
 			if (nIndex >= 0 && nIndex < BITS_COUNT)
@@ -59,16 +51,16 @@ namespace xsix
 				{
 					m_InnerBytes[nByteIndex] &= ~(0x01 << nInnerBitIndex);
 				}
-			}			
+			}
 		}
-		
+
 		bool Get(int32_t nIndex)
 		{
 			if (nIndex >= 0 && nIndex < BITS_COUNT)
 			{
 				int32_t nByteIndex = nIndex / 8;
 				int32_t nInnerBitIndex = nIndex % 8;
-				return ( m_InnerBytes[nByteIndex] & (0x01 << nInnerBitIndex) ) ? true : false;
+				return (m_InnerBytes[nByteIndex] & (0x01 << nInnerBitIndex)) ? true : false;
 			}
 			return false;
 		}
@@ -78,7 +70,7 @@ namespace xsix
 			if (nIndex >= 0 && nIndex < BITS_COUNT)
 			{
 				Set(nIndex, !Get(nIndex));
-			}	
+			}
 		}
 
 		std::string GetBitString()
