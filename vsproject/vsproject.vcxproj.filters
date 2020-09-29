@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="xsix">
+      <UniqueIdentifier>{7bcc22d8-7ebe-4169-91f8-17fb1d305d2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xsix\network">
+      <UniqueIdentifier>{f1c9cf6b-c8f6-48ba-b685-384cfa9255e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xsix\utils">
+      <UniqueIdentifier>{f5e67708-c459-403f-b995-d23adaa4df4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xsix\time">
+      <UniqueIdentifier>{3701deb9-f1d4-44f6-b88c-98847d8ae6b7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\xsix\network\network.cc">
+      <Filter>xsix\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\network\network_socket_api.cc">
+      <Filter>xsix\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\network\tcp_client.cc">
+      <Filter>xsix\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\network\tcp_server.cc">
+      <Filter>xsix\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\time\duration.cc">
+      <Filter>xsix\time</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\time\timestamp.cc">
+      <Filter>xsix\time</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\utils\file_utils.cc">
+      <Filter>xsix\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\utils\math_utils.cc">
+      <Filter>xsix\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\utils\string_utils.cc">
+      <Filter>xsix\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\buffer.cc">
+      <Filter>xsix</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\xsix\network\network.h">
+      <Filter>xsix\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\network\tcp_client.h">
+      <Filter>xsix\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\network\tcp_server.h">
+      <Filter>xsix\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\time\duration.h">
+      <Filter>xsix\time</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\time\gettimeofday.h">
+      <Filter>xsix\time</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\time\timestamp.h">
+      <Filter>xsix\time</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\utils\file_utils.h">
+      <Filter>xsix\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\utils\math_utils.h">
+      <Filter>xsix\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\utils\string_utils.h">
+      <Filter>xsix\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\bits.hpp">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\buffer.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\common_define.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
