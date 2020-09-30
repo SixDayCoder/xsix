@@ -27,12 +27,6 @@
     <ClCompile Include="..\src\xsix\network\tcp_server.cc">
       <Filter>xsix\network</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\xsix\time\duration.cc">
-      <Filter>xsix\time</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\xsix\time\timestamp.cc">
-      <Filter>xsix\time</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\xsix\utils\file_utils.cc">
       <Filter>xsix\utils</Filter>
     </ClCompile>

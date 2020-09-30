@@ -35,7 +35,6 @@ namespace xsix
 	{
 		while (!m_bQuit)
 		{
-			Timestamp::PrintNow();
 			RunSend();
 			RunRecv();	
 		}

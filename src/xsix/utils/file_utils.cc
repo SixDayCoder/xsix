@@ -5,6 +5,7 @@
 
 namespace xsix
 {
+
 #if defined(_XSIX_WINDOWS)
 	static bool __path_exists_windows(const std::string& path, WIN32_FIND_DATA* wf_data)
 	{

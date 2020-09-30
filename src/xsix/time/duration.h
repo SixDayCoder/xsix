@@ -28,23 +28,36 @@ namespace xsix
 
 		explicit Duration(int32_t nanoseconds) : m_ns(nanoseconds) {}
 
-		int64_t Nanoseconds() const { return m_ns;}
+	public:
 
-		int64_t Seconds() const { return m_ns * kSecond; }
+		int64_t seconds() const { return m_ns / kSecond; }
 
-		int64_t Milliseconds() const { return m_ns * kMilliseoncd;}
+		int64_t millseconds() const { return m_ns / kMilliseoncd;}
 
-		int64_t Microseconds() const { return m_ns * kMicrosecond; }
+		int64_t microseconds() const { return m_ns / kMicrosecond; }
 
-		int64_t Minutes() const { return m_ns * kMinute; }
+		int64_t nanoseconds() const { return m_ns; }
 
-		int64_t Hours() const { return m_ns * kHour; }
+		int64_t minutes() const { return m_ns / kMinute; }
 
-		struct timeval TimeVal() const;
+		int64_t hours() const { return m_ns / kHour; }
 
-		void To(struct timeval* t) const;
+	public:
 
-		bool IsZero() const { return m_ns == 0; }
+		struct timeval get_time_val() const
+		{
+			struct timeval t;
+			make_time_val(&t);
+			return t;
+		}
+
+		void make_time_val(struct timeval* t) const
+		{
+			t->tv_sec = static_cast<long>(m_ns / kSecond);
+			t->tv_usec = static_cast<long> (m_ns % kSecond) / static_cast<long>(kMicrosecond);
+		}
+
+	public:
 
 		bool operator <  (const Duration& rhs) const { return m_ns < rhs.m_ns; }
 
@@ -56,11 +69,23 @@ namespace xsix
 
 		bool operator == (const Duration& rhs) const { return m_ns == rhs.m_ns; }
 
-		Duration operator += (const Duration& rhs);
+	public:
 
-		Duration operator -= (const Duration& rhs);
+		Duration operator += (const Duration& rhs)
+		{
+			m_ns += rhs.m_ns;
+			return *this;
+		}
+
+		Duration operator -= (const Duration& rhs)
+		{
+			m_ns -= rhs.m_ns;
+			return *this;
+		}
 
 	private:
+
 		int64_t m_ns; // nanoseconds
+
 	};
 }

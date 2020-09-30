@@ -144,8 +144,6 @@
     <ClCompile Include="..\src\xsix\network\network_socket_api.cc" />
     <ClCompile Include="..\src\xsix\network\tcp_client.cc" />
     <ClCompile Include="..\src\xsix\network\tcp_server.cc" />
-    <ClCompile Include="..\src\xsix\time\duration.cc" />
-    <ClCompile Include="..\src\xsix\time\timestamp.cc" />
     <ClCompile Include="..\src\xsix\utils\file_utils.cc" />
     <ClCompile Include="..\src\xsix\utils\math_utils.cc" />
     <ClCompile Include="..\src\xsix\utils\string_utils.cc" />

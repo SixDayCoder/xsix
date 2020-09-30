@@ -28,7 +28,6 @@ namespace xsix
 	{
 		while (!m_bQuit)
 		{
-			Timestamp::PrintNow();
 			RunAccept();
 		}
 	}
