@@ -96,164 +96,166 @@ namespace xsix
 	{
 		std::string	get_socket_error_msg();
 
-		void	network_env_init();
+		void		network_env_init();
 
-		void	network_env_cleanup();
+		void		network_env_cleanup();
 
-		bool	set_socket_opt(SOCKET fd, int32_t socktype, int32_t opname, void* opval, uint32_t oplen);
+		bool		set_socket_opt(SOCKET fd, int32_t socktype, int32_t opname, void* opval, uint32_t oplen);
 
-		void	log_socket_error();
+		void		log_socket_error();
 
-		void	close_socket(SOCKET fd);
+		void		close_socket(SOCKET fd);
 
-		SOCKET	create_socket(bool use_ipv6 = false);
+		SOCKET		create_socket(bool use_ipv6 = false);
 
-		bool	set_nonblock(SOCKET fd, bool on);
+		bool		set_nonblock(SOCKET fd, bool on);
 
-		bool	set_reuse_addr(SOCKET fd);
+		bool		set_reuse_addr(SOCKET fd);
 
-		bool	set_reuse_port(SOCKET fd);
+		bool		set_reuse_port(SOCKET fd);
 
-		bool	set_linger_ex(SOCKET fd, uint32_t linger_time);
+		bool		set_linger_ex(SOCKET fd, uint32_t linger_time);
 
-		bool	set_tcp_nodelay(SOCKET fd, bool on);
+		bool		set_tcp_nodelay(SOCKET fd, bool on);
 
-		bool	bind_ex(SOCKET fd, uint16_t port, bool use_ipv6 = false);
+		bool		bind_ex(SOCKET fd, uint16_t port, bool use_ipv6 = false);
 
-		bool	listen_ex(SOCKET fd, int32_t backlog);
+		bool		listen_ex(SOCKET fd, int32_t backlog);
 
-		int32_t	recv_bytes(SOCKET fd, char* buffer, int32_t cnt);
+		int32_t		recvbytes(SOCKET fd, char* buffer, int32_t cnt);
 
-		int32_t	send_bytes(SOCKET fd, const char* buffer, int32_t cnt);
+		int32_t		sendbytes(SOCKET fd, const char* buffer, int32_t cnt);
+
+		void		shutdown_write(SOCKET fd);
+
+		void		shutdown_read(SOCKET fd);
+
+		void		shutdown_both(SOCKET fd);
+
+		bool		is_ipv4_addr(const std::string& ip);
+
+		bool		is_ipv6_addr(const std::string& ip);	
 	}
-
-	class NetAddr;
-
-	class Socket;
-
-	class ClientSocket;
-
-	class ServerSocket;
 
 	class NetAddr
 	{
 	public:
 
-		friend class Socket;
+		explicit NetAddr(const std::string& ip, uint16_t port, bool ipv6 = false);
 
-		friend class ClientSocket;
-
-		friend class ServerSocket;
+		NetAddr(bool ipv6 = false) : m_ipv6(ipv6) { memset(&m_ss, 0, sizeof(m_ss)); }
 
 	public:
 
-		explicit NetAddr(const std::string& ip, uint16_t port, bool bUseIPv6 = false);
+		std::string				ipaddress();
 
-		NetAddr(bool bUseIPv6 = false);
+		uint16_t				port();
 
-	public:
+		bool					get_ipv6() const { return m_ipv6; }
 
-		std::string IP();
+		void					set_ipv6(bool ipv6) { m_ipv6 = ipv6; }
 
-		uint16_t    Port();
+		void					set_sockaddr_storage(struct sockaddr_storage ss) { m_ss = ss; }
 
-	public:
-
-		static bool IsIPv4Addr(const std::string& ip);
-
-		static bool IsIPv6Addr(const std::string& ip);
+		struct sockaddr_storage get_sockaddr_storage() const { return m_ss; }
 
 	private:
 
-		bool ipv6;
-
-		//struct used only for storage
-		//access it by using hints or cast to some specific address type
-		struct sockaddr_storage ss;
+		struct sockaddr_storage		m_ss;
+		bool						m_ipv6;	
 	};
 
-	class Socket
+	class TCPSocket
 	{
 	public:
 
-		explicit Socket(SOCKET fd, bool bUseIPv6 = false) :
+		explicit TCPSocket(SOCKET fd, bool use_ipv6 = false) :
 			m_fd(fd),
-			m_bUseIPv6(bUseIPv6) {}
+			m_ipv6(use_ipv6) {}
 
-		explicit Socket(bool bUseIPv6 = false);
+		explicit TCPSocket(bool use_ipv6 = false) : m_ipv6(use_ipv6)
+		{
+			m_fd = socketapi::create_socket(use_ipv6);
+			XASSERT(m_fd != INVALID_SOCKET);
+		}
 
-		Socket(const Socket& other) = delete;
+		TCPSocket(const TCPSocket& other) = delete;
 
-		Socket& operator = (const Socket& other) = delete;
-
-	public:
-
-		bool	SetNonBlock(bool on);
-
-		bool	SetTCPNoDelay(bool on);
-
-		bool	IsValid() const { return m_fd != INVALID_SOCKET; }
-
-		SOCKET	GetSockfd() const { return m_fd; };
-
-		void	Close();
+		TCPSocket& operator = (const TCPSocket& other) = delete;
 
 	public:
 
-		int32_t RecvBytes(char* buffer, int32_t nCount);
+		SOCKET	get_sockfd() const { return m_fd; };
 
-		int32_t SendBytes(const char* buffer, int32_t nCount);
+		bool	set_nonblock(bool on) { return socketapi::set_nonblock(m_fd, on); }
+
+		bool	set_nodelay(bool on) { return socketapi::set_tcp_nodelay(m_fd, on); }
+
+		bool	is_valid() const { return m_fd != INVALID_SOCKET; }
+
+		void	close() { socketapi::close_socket(m_fd); }
+
+		void    shutdown_read() { socketapi::shutdown_read(m_fd); }
+		
+		void    shutdown_write() { socketapi::shutdown_read(m_fd); }
+
+		void    shutdown_both() { socketapi::shutdown_read(m_fd); }
+
+	public:
+
+		int32_t recvbytes(char* buffer, int32_t cnt) { return socketapi::recvbytes(m_fd, buffer, cnt); }
+
+		int32_t sendbytes(const char* buffer, int32_t cnt) { return socketapi::sendbytes(m_fd, buffer, cnt); }
 
 	protected:
 
-		bool   m_bUseIPv6;
+		bool   m_ipv6;
 
 		SOCKET m_fd;
 	};
 
-	class ClientSocket : public Socket
+	class TCPClientSocket : public TCPSocket
 	{
 	public:
 
-		explicit ClientSocket(bool bUseIPv6 = false) : Socket(bUseIPv6) {}
+		explicit TCPClientSocket(bool use_ipv6 = false) : TCPSocket(use_ipv6) {}
 
-		virtual ~ClientSocket() {}
+		virtual ~TCPClientSocket() {}
 
-		ClientSocket(const ClientSocket& other) = delete;
+		TCPClientSocket(const TCPClientSocket& other) = delete;
 
-		ClientSocket& operator = (const ClientSocket& other) = delete;
+		TCPClientSocket& operator = (const TCPClientSocket& other) = delete;
 
 	public:
 
-		bool Connect(const NetAddr& addr);
-
+		bool connect_ex(const NetAddr& addr);
 	};
 
-	class ServerSocket : public Socket
+	class TCPServerSocket : public TCPSocket
 	{
 	public:
 
-		explicit ServerSocket(bool bUseIPv6 = false) : Socket(bUseIPv6), m_Port(0) {}
+		explicit TCPServerSocket(bool use_ipv6 = false) : TCPSocket(use_ipv6), m_port(0) {}
 
-		ServerSocket(const ServerSocket& other) = delete;
+		TCPServerSocket(const TCPServerSocket& other) = delete;
 
-		ServerSocket& operator = (const ServerSocket& other) = delete;
+		TCPServerSocket& operator = (const TCPServerSocket& other) = delete;
 
 	public:
 
-		bool	SetReusePort();
+		bool	set_reuse_port() { return socketapi::set_reuse_port(m_fd); };
 
-		bool	SetReuseAddr();
+		bool	set_reuse_addr() { return socketapi::set_reuse_addr(m_fd); };
 
-		bool	Bind(uint16_t port);
+		bool	bind_ex(uint16_t port) { m_port = port; return socketapi::bind_ex(m_fd, m_port, m_ipv6); }
 
-		bool	Listen(int32_t backlog = XSIX_DEFAULT_LISTEN_BACKLOG);
+		bool	listen_ex(int32_t backlog = XSIX_DEFAULT_LISTEN_BACKLOG) { return socketapi::listen_ex(m_fd, backlog); }
 
-		SOCKET	Accept(NetAddr* addr);
+		SOCKET	accept_ex(NetAddr* addr);
 
 	private:
 
-		uint16_t m_Port;
+		uint16_t m_port;
 
 	};
 }

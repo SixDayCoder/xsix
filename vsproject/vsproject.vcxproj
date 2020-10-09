@@ -142,8 +142,6 @@
     <ClCompile Include="..\src\xsix\buffer.cc" />
     <ClCompile Include="..\src\xsix\network\network.cc" />
     <ClCompile Include="..\src\xsix\network\network_socket_api.cc" />
-    <ClCompile Include="..\src\xsix\network\tcp_client.cc" />
-    <ClCompile Include="..\src\xsix\network\tcp_server.cc" />
     <ClCompile Include="..\src\xsix\utils\file_utils.cc" />
     <ClCompile Include="..\src\xsix\utils\math_utils.cc" />
     <ClCompile Include="..\src\xsix\utils\string_utils.cc" />
@@ -154,8 +152,6 @@
     <ClInclude Include="..\src\xsix\buffer.h" />
     <ClInclude Include="..\src\xsix\common_define.h" />
     <ClInclude Include="..\src\xsix\network\network.h" />
-    <ClInclude Include="..\src\xsix\network\tcp_client.h" />
-    <ClInclude Include="..\src\xsix\network\tcp_server.h" />
     <ClInclude Include="..\src\xsix\time\duration.h" />
     <ClInclude Include="..\src\xsix\time\gettimeofday.h" />
     <ClInclude Include="..\src\xsix\time\timestamp.h" />

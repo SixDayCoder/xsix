@@ -21,12 +21,6 @@
     <ClCompile Include="..\src\xsix\network\network_socket_api.cc">
       <Filter>xsix\network</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\xsix\network\tcp_client.cc">
-      <Filter>xsix\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\xsix\network\tcp_server.cc">
-      <Filter>xsix\network</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\xsix\utils\file_utils.cc">
       <Filter>xsix\utils</Filter>
     </ClCompile>
@@ -43,12 +37,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\xsix\network\network.h">
-      <Filter>xsix\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\xsix\network\tcp_client.h">
-      <Filter>xsix\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\xsix\network\tcp_server.h">
       <Filter>xsix\network</Filter>
     </ClInclude>
     <ClInclude Include="..\src\xsix\time\duration.h">

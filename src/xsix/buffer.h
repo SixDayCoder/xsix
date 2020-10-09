@@ -38,7 +38,7 @@ namespace xsix
 
 		int32_t	size() const { return m_size; }
 
-		int32_t	free_size() const  { return ((m_head <= m_tail) ? (m_size - m_tail + m_head - 1) : (m_head - m_tail - 1)); }
+		int32_t	get_free_size() const  { return ((m_head <= m_tail) ? (m_size - m_tail + m_head - 1) : (m_head - m_tail - 1)); }
 
 	private:
 

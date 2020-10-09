@@ -63,7 +63,7 @@ namespace xsix
 			return 0;
 		}
 
-		if (free_size() < size)
+		if (get_free_size() < size)
 		{
 			if (!resize(length() + size))
 			{
@@ -191,7 +191,7 @@ namespace xsix
 		snprintf(fmt, 
 			2048,
 			"buffer::[head : %d, tail : %d, length : %d, size : %d, free_size : %d, data : \"%s\"]",
-			m_head, m_tail, length(), size(), free_size(), tmp
+			m_head, m_tail, length(), size(), get_free_size(), tmp
 		);
 		return std::string(fmt);
 	}

@@ -121,6 +121,10 @@ namespace xsix
 
 		void close_socket(SOCKET fd)
 		{
+			if (fd == INVALID_SOCKET)
+			{
+				return;
+			}
 #if defined(_XSIX_WINDOWS)
 			closesocket(fd);
 #else 
@@ -254,7 +258,7 @@ namespace xsix
 			return true;
 		}
 
-		int32_t recv_bytes(SOCKET fd, char* buffer, int32_t cnt)
+		int32_t recvbytes(SOCKET fd, char* buffer, int32_t cnt)
 		{
 			if (fd == INVALID_SOCKET)
 			{
@@ -277,7 +281,7 @@ namespace xsix
 			return rc;
 		}
 
-		int32_t send_bytes(SOCKET fd, const char* buffer, int32_t cnt)
+		int32_t sendbytes(SOCKET fd, const char* buffer, int32_t cnt)
 		{
 			if (fd == INVALID_SOCKET)
 			{
@@ -292,6 +296,49 @@ namespace xsix
 			}
 
 			return rc;
+		}
+
+		bool is_ipv4_addr(const std::string& ip)
+		{
+			struct sockaddr_in addr;
+			memset(&addr, 0, sizeof(addr));
+			int32_t rc = inet_pton(AF_INET, ip.c_str(), &addr.sin_addr);
+			return rc == 0 ? true : false;
+		}
+
+		bool is_ipv6_addr(const std::string& ip)
+		{
+			struct sockaddr_in6 addr;
+			memset(&addr, 0, sizeof(addr));
+			int32_t rc = inet_pton(AF_INET6, ip.c_str(), &addr.sin6_addr);
+			return rc == 0 ? true : false;
+		}
+
+		void socketapi::shutdown_write(SOCKET fd)
+		{
+#if defined(_XSIX_WINDOWS)
+			shutdown(fd, SD_SEND);
+#elif defined(_XSIX_LINUX)
+			shutdown(fd, SHUT_WR);
+#endif
+		}
+
+		void socketapi::shutdown_read(SOCKET fd)
+		{
+#if defined(_XSIX_WINDOWS)
+			shutdown(fd, SD_RECEIVE);
+#elif defined(_XSIX_LINUX)
+			shutdown(fd, SHUT_RD);
+#endif
+		}
+
+		void socketapi::shutdown_both(SOCKET fd)
+		{
+#if defined(_XSIX_WINDOWS)
+			shutdown(fd, SD_BOTH);
+#elif defined(_XSIX_LINUX)
+			shutdown(fd, SHUT_RDWR);
+#endif
 		}
 	}
 }
