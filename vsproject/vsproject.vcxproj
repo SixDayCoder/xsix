@@ -149,9 +149,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\xsix\bits.hpp" />
+    <ClInclude Include="..\src\xsix\block_queue.hpp" />
     <ClInclude Include="..\src\xsix\buffer.h" />
     <ClInclude Include="..\src\xsix\common_define.h" />
     <ClInclude Include="..\src\xsix\network\network.h" />
+    <ClInclude Include="..\src\xsix\noncopyable.h" />
     <ClInclude Include="..\src\xsix\time\duration.h" />
     <ClInclude Include="..\src\xsix\time\gettimeofday.h" />
     <ClInclude Include="..\src\xsix\time\timestamp.h" />

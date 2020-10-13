@@ -66,5 +66,11 @@
     <ClInclude Include="..\src\xsix\common_define.h">
       <Filter>xsix</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\xsix\block_queue.hpp">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\noncopyable.h">
+      <Filter>xsix</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

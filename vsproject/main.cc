@@ -1,5 +1,6 @@
 #include "xsix/network/network.h"
 #include "xsix/time/timestamp.h"
+#include "xsix/block_queue.hpp"
 #include <stdio.h>
 
 int main()
