@@ -34,6 +34,21 @@
       <Filter>xsix</Filter>
     </ClCompile>
     <ClCompile Include="main.cc" />
+    <ClCompile Include="..\src\xsix\network\channel.cc">
+      <Filter>xsix\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\network\eventloop.cc">
+      <Filter>xsix\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\network\poller.cc">
+      <Filter>xsix\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\network\poller_select.cc">
+      <Filter>xsix\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\network\acceptor.cc">
+      <Filter>xsix\network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\xsix\network\network.h">
@@ -71,6 +86,21 @@
     </ClInclude>
     <ClInclude Include="..\src\xsix\noncopyable.h">
       <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\network\channel.h">
+      <Filter>xsix\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\network\eventloop.h">
+      <Filter>xsix\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\network\poller.h">
+      <Filter>xsix\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\network\poller_select.h">
+      <Filter>xsix\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\network\acceptor.h">
+      <Filter>xsix\network</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
