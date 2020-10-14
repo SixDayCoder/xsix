@@ -26,14 +26,11 @@ namespace xsix
 			FD_SET(fd, &m_except_set);
 			if (max_socket_id < it->second->get_fd())
 			{
-				max_socket_id = max_socket_id;
+				max_socket_id = fd;
 			}
 		}
 
-		struct timeval tv;
-		tv.tv_sec = 0;
-		tv.tv_usec = timeout_ms * 1000;
-
+		struct timeval tv { 0, timeout_ms * 1000 };
 		int rc = ::select(max_socket_id + 1, &m_read_set, &m_write_set, &m_except_set, &tv);
 
 		//error

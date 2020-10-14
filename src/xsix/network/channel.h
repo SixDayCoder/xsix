@@ -34,15 +34,27 @@ namespace xsix
 
 		void	set_error_cb(EventCallBack cb) { m_error_cb = std::move(cb); }
 
+		void    handle_event();
+
 	public:
 
-		int		get_fd() const { return m_fd; }
+		EventLoop*	get_owner_eventloop() { return m_eventloop; }
+
+		void		update_to_eventloop();
+
+		void		remove_from_eventloop();
+
+	public:
+
+		const int	get_fd() const { return m_fd; }
 
 	public:
 
 		EventLoop*		m_eventloop;
 
 		const int		m_fd;
+
+		int				m_events;
 
 		EventCallBack	m_read_cb;
 
@@ -51,6 +63,7 @@ namespace xsix
 		EventCallBack   m_close_cb;
 
 		EventCallBack	m_error_cb;	
+
 	};
 
 }

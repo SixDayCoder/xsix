@@ -54,7 +54,34 @@ namespace xsix
 		cleanup();
 	}
 
-	int32_t buffer::write(const char* src, int32_t size)
+	void buffer::neaten()
+	{
+		if (empty())
+		{
+			return;
+		}
+
+		char* new_data = (char*)XMALLOC(m_size);
+		XASSERT(new_data);
+
+		if (m_head < m_tail)
+		{
+			memcpy(new_data, &m_data[m_head], m_tail - m_head);
+		}
+		else if (m_head > m_tail)
+		{
+			memcpy(new_data, &m_data[m_head], m_size - m_head);
+			memcpy(&new_data[m_size - m_head], m_data, m_tail);
+		}
+
+		XFREE(m_data);
+		m_data = new_data;
+		m_head = 0;
+		m_tail = length();
+		m_size = m_size;
+	}
+
+	int32_t buffer::read_from(const char* src, int32_t size)
 	{
 		XASSERT(src);
 
@@ -112,7 +139,7 @@ namespace xsix
 		return size;
 	}
 
-	int32_t buffer::read(char* dst, int32_t size)
+	int32_t buffer::write_to(char* dst, int32_t size)
 	{
 		if (size == 0)
 		{
@@ -135,15 +162,15 @@ namespace xsix
 		}
 		else
 		{
-			int32_t nRightlength = m_size - m_head;
-			if (size <= nRightlength)
+			int32_t right_free = m_size - m_head;
+			if (size <= right_free)
 			{
 				memcpy(dst, &m_data[m_head], size);
 			}
 			else
 			{
-				memcpy(dst, &m_data[m_head], nRightlength);
-				memcpy(&dst[nRightlength], m_data, size - nRightlength);
+				memcpy(dst, &m_data[m_head], right_free);
+				memcpy(&dst[right_free], m_data, size - right_free);
 			}
 		}
 

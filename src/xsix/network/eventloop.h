@@ -35,6 +35,10 @@ namespace xsix
 
 	private:
 
+		void run_tick_after_handle_event();
+
+	private:
+
 		bool				  m_running;
 		bool				  m_quit;
 		bool				  m_handling;

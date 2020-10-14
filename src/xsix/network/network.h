@@ -147,9 +147,9 @@ namespace xsix
 
 	public:
 
-		std::string				ipaddress();
+		std::string				ipaddress() const;
 
-		uint16_t				port();
+		uint16_t				port() const;
 
 		bool					get_ipv6() const { return m_ipv6; }
 
@@ -169,7 +169,7 @@ namespace xsix
 	{
 	public:
 
-		explicit TCPSocket(SOCKET fd, bool use_ipv6 = false) :
+		explicit TCPSocket(int fd, bool use_ipv6 = false) :
 			m_fd(fd),
 			m_ipv6(use_ipv6) {}
 

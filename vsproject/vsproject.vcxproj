@@ -88,7 +88,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>26495;6319</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26495;6319;6262</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,6 +148,8 @@
     <ClCompile Include="..\src\xsix\network\network_socket_api.cc" />
     <ClCompile Include="..\src\xsix\network\poller.cc" />
     <ClCompile Include="..\src\xsix\network\poller_select.cc" />
+    <ClCompile Include="..\src\xsix\network\tcp_conn.cc" />
+    <ClCompile Include="..\src\xsix\network\tcp_server.cc" />
     <ClCompile Include="..\src\xsix\utils\file_utils.cc" />
     <ClCompile Include="..\src\xsix\utils\math_utils.cc" />
     <ClCompile Include="..\src\xsix\utils\string_utils.cc" />
@@ -164,6 +166,8 @@
     <ClInclude Include="..\src\xsix\network\network.h" />
     <ClInclude Include="..\src\xsix\network\poller.h" />
     <ClInclude Include="..\src\xsix\network\poller_select.h" />
+    <ClInclude Include="..\src\xsix\network\tcp_conn.h" />
+    <ClInclude Include="..\src\xsix\network\tcp_server.h" />
     <ClInclude Include="..\src\xsix\noncopyable.h" />
     <ClInclude Include="..\src\xsix\time\duration.h" />
     <ClInclude Include="..\src\xsix\time\gettimeofday.h" />

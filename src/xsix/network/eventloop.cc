@@ -1,6 +1,7 @@
 #include "xsix/network/eventloop.h"
 #include "xsix/network/poller.h"
 #include "xsix/network/poller_select.h"
+#include "xsix/network/channel.h"
 
 namespace xsix
 {
@@ -34,11 +35,12 @@ namespace xsix
 			for (Channel* channel : m_active_channel_list)
 			{
 				m_curr_active_channel = channel;
-				//handle event
+				m_curr_active_channel->handle_event();
 			}
 			m_curr_active_channel = nullptr;
 			m_handling = false;
 
+			run_tick_after_handle_event();
 		}
 	}
 
@@ -49,17 +51,27 @@ namespace xsix
 
 	void EventLoop::update_channel(Channel* channel)
 	{
-
+		XASSERT(channel->get_owner_eventloop() == this);
+		m_poller->update_channel(channel);
 	}
 
 	void EventLoop::remove_channel(Channel* channel)
 	{
-
+		XASSERT(channel->get_owner_eventloop() == this);
+		m_poller->remove_channel(channel);
 	}
 
 	bool EventLoop::has_channel(Channel* channel)
 	{
-		return false;
+		return m_poller->has_channel(channel);
+	}
+
+	void EventLoop::run_tick_after_handle_event()
+	{
+		printf("timestamp : %lld, active channel cnt : %d\n", 
+			xsix::Timestamp::now().unixmills(),
+			m_active_channel_list.size()
+		);
 	}
 
 }

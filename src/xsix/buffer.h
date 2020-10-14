@@ -29,11 +29,17 @@ namespace xsix
 
 	public:
 
-		bool	empty() const { return m_head == m_tail; }
+		const char* buf() { return m_data; }
 
-		int32_t	write(const char* src, int32_t size);
+		bool		empty() const { return m_head == m_tail; }
 
-		int32_t	read(char* dst, int32_t size);
+		void		neaten();
+
+	public:
+
+		int32_t	read_from(const char* src, int32_t size);
+
+		int32_t	write_to(char* dst, int32_t size);
 
 		int32_t	length()  const;
 

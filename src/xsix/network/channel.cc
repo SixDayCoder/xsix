@@ -20,6 +20,25 @@ namespace xsix
 
 	}
 
+	void Channel::handle_event()
+	{
+		//TODO:
+		if(m_read_cb)
+		{
+			m_read_cb();
+		}
+	}
+
+	void Channel::update_to_eventloop()
+	{
+		m_eventloop->update_channel(this);
+	}
+
+	void Channel::remove_from_eventloop()
+	{
+		m_eventloop->remove_channel(this);
+	}
+
 }
 
 

@@ -219,6 +219,7 @@ namespace xsix
 			{
 				sockaddr_in6 addr;
 				memset(&addr, 0, sizeof(addr));
+
 				addr.sin6_family = AF_INET6;
 				addr.sin6_port = htons(port);
 				addr.sin6_addr = in6addr_any;
@@ -234,6 +235,7 @@ namespace xsix
 			{
 				sockaddr_in addr;
 				memset(&addr, 0, sizeof(addr));
+
 				addr.sin_family = AF_INET;
 				addr.sin_port = htons(port);
 				addr.sin_addr.s_addr = htonl(INADDR_ANY);

@@ -49,6 +49,12 @@
     <ClCompile Include="..\src\xsix\network\acceptor.cc">
       <Filter>xsix\network</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\xsix\network\tcp_conn.cc">
+      <Filter>xsix\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\network\tcp_server.cc">
+      <Filter>xsix\network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\xsix\network\network.h">
@@ -100,6 +106,12 @@
       <Filter>xsix\network</Filter>
     </ClInclude>
     <ClInclude Include="..\src\xsix\network\acceptor.h">
+      <Filter>xsix\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\network\tcp_conn.h">
+      <Filter>xsix\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\network\tcp_server.h">
       <Filter>xsix\network</Filter>
     </ClInclude>
   </ItemGroup>

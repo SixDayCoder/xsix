@@ -26,7 +26,7 @@ namespace xsix
 		}
 	}
 
-	std::string NetAddr::ipaddress()
+	std::string NetAddr::ipaddress() const
 	{
 		if (m_ss.ss_family == AF_INET && !m_ipv6)
 		{
@@ -45,7 +45,7 @@ namespace xsix
 		return "";
 	}
 
-	uint16_t NetAddr::port()
+	uint16_t NetAddr::port() const
 	{
 		if (m_ss.ss_family == AF_INET && !m_ipv6)
 		{
