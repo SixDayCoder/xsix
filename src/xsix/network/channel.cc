@@ -29,6 +29,30 @@ namespace xsix
 		}
 	}
 
+	void Channel::enable_read()
+	{
+		//TODO:
+		update_to_eventloop();
+	}
+
+	void Channel::disable_read()
+	{
+		//TODO:
+		update_to_eventloop();
+	}
+
+	void Channel::enable_write()
+	{
+		//TODO:
+		update_to_eventloop();
+	}
+
+	void Channel::disable_write()
+	{
+		//TODO:
+		update_to_eventloop();
+	}
+
 	void Channel::update_to_eventloop()
 	{
 		m_eventloop->update_channel(this);

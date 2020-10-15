@@ -89,7 +89,7 @@ namespace xsix
 
 		}
 
-		bool set_socket_opt(SOCKET fd, int32_t socktype, int32_t opname, void* opval, uint32_t oplen)
+		bool set_socket_opt(int fd, int32_t socktype, int32_t opname, void* opval, uint32_t oplen)
 		{
 #if defined(_XSIX_WINDOWS)
 
@@ -119,7 +119,7 @@ namespace xsix
 			printf("socket error : %s", get_socket_error_msg().c_str());
 		}
 
-		void close_socket(SOCKET fd)
+		void close_socket(int fd)
 		{
 			if (fd == INVALID_SOCKET)
 			{
@@ -132,10 +132,10 @@ namespace xsix
 #endif
 		}
 
-		SOCKET create_socket(bool use_ipv6 /*= false*/)
+		int create_socket(bool use_ipv6 /*= false*/)
 		{
 			int32_t domain = use_ipv6 ? AF_INET6 : AF_INET;
-			SOCKET sock = socket(domain, SOCK_STREAM, 0);
+			int sock = socket(domain, SOCK_STREAM, 0);
 			if (sock == INVALID_SOCKET)
 			{
 				log_socket_error();
@@ -143,7 +143,7 @@ namespace xsix
 			return sock;
 		}
 
-		bool set_nonblock(SOCKET fd, bool on)
+		bool set_nonblock(int fd, bool on)
 		{
 			if (fd == INVALID_SOCKET)
 			{
@@ -184,13 +184,13 @@ namespace xsix
 			return false;
 		}
 
-		bool set_reuse_addr(SOCKET fd)
+		bool set_reuse_addr(int fd)
 		{
 			int32_t opval = 1;
 			return set_socket_opt(fd, SOL_SOCKET, SO_REUSEADDR, &opval, sizeof(opval));
 		}
 
-		bool set_reuse_port(SOCKET fd)
+		bool set_reuse_port(int fd)
 		{
 #ifdef SO_REUSEPORT
 			int32_t opval = 1;
@@ -199,7 +199,7 @@ namespace xsix
 			return false;
 		}
 
-		bool set_linger_ex(SOCKET fd, uint32_t linger_time)
+		bool set_linger_ex(int fd, uint32_t linger_time)
 		{
 			struct linger socklinger;
 			socklinger.l_onoff = linger_time > 0 ? 1 : 0;
@@ -207,13 +207,13 @@ namespace xsix
 			return set_socket_opt(fd, SOL_SOCKET, SO_LINGER, &socklinger, sizeof(socklinger));
 		}
 
-		bool set_tcp_nodelay(SOCKET fd, bool on)
+		bool set_tcp_nodelay(int fd, bool on)
 		{
 			int32_t opval = on ? 1 : 0;
 			return set_socket_opt(fd, IPPROTO_TCP, TCP_NODELAY, &opval, sizeof(opval));
 		}
 
-		bool bind_ex(SOCKET fd, uint16_t port, bool use_ipv6 /*= false*/)
+		bool bind_ex(int fd, uint16_t port, bool use_ipv6 /*= false*/)
 		{
 			if (use_ipv6)
 			{
@@ -224,11 +224,13 @@ namespace xsix
 				addr.sin6_port = htons(port);
 				addr.sin6_addr = in6addr_any;
 				int32_t rc = bind(fd, (const sockaddr*)&addr, sizeof(addr));
+
 				if (rc == SOCKET_ERROR)
 				{
 					log_socket_error();
 					return false;
 				}
+
 				return true;
 			}
 			else
@@ -240,16 +242,18 @@ namespace xsix
 				addr.sin_port = htons(port);
 				addr.sin_addr.s_addr = htonl(INADDR_ANY);
 				int32_t rc = bind(fd, (const sockaddr*)&addr, sizeof(addr));
+
 				if (rc == SOCKET_ERROR)
 				{
 					log_socket_error();
 					return false;
 				}
+
 				return true;
 			}
 		}
 
-		bool listen_ex(SOCKET fd, int32_t nBacklog)
+		bool listen_ex(int fd, int32_t nBacklog)
 		{
 			int32_t rc = listen(fd, nBacklog);
 			if (rc == SOCKET_ERROR)
@@ -260,7 +264,7 @@ namespace xsix
 			return true;
 		}
 
-		int32_t recvbytes(SOCKET fd, char* buffer, int32_t cnt)
+		int32_t recvbytes(int fd, char* buffer, int32_t cnt)
 		{
 			if (fd == INVALID_SOCKET)
 			{
@@ -283,7 +287,7 @@ namespace xsix
 			return rc;
 		}
 
-		int32_t sendbytes(SOCKET fd, const char* buffer, int32_t cnt)
+		int32_t sendbytes(int fd, const char* buffer, int32_t cnt)
 		{
 			if (fd == INVALID_SOCKET)
 			{
@@ -316,7 +320,7 @@ namespace xsix
 			return rc == 0 ? true : false;
 		}
 
-		void socketapi::shutdown_write(SOCKET fd)
+		void socketapi::shutdown_write(int fd)
 		{
 #if defined(_XSIX_WINDOWS)
 			shutdown(fd, SD_SEND);
@@ -325,7 +329,7 @@ namespace xsix
 #endif
 		}
 
-		void socketapi::shutdown_read(SOCKET fd)
+		void socketapi::shutdown_read(int fd)
 		{
 #if defined(_XSIX_WINDOWS)
 			shutdown(fd, SD_RECEIVE);
@@ -334,7 +338,7 @@ namespace xsix
 #endif
 		}
 
-		void socketapi::shutdown_both(SOCKET fd)
+		void socketapi::shutdown_both(int fd)
 		{
 #if defined(_XSIX_WINDOWS)
 			shutdown(fd, SD_BOTH);

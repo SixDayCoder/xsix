@@ -38,6 +38,16 @@ namespace xsix
 
 	public:
 
+		void	enable_read();
+
+		void	disable_read();
+
+		void	enable_write();
+
+		void	disable_write();
+
+	public:
+
 		EventLoop*	get_owner_eventloop() { return m_eventloop; }
 
 		void		update_to_eventloop();

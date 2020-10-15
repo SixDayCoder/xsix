@@ -35,7 +35,13 @@ namespace xsix
 		printf("new tcp conn established : <sockfd : %d, ip : %s, port : %d>\n", 
 			sockfd, addr.ipaddress().c_str(), addr.port()
 		);
-		TCPConnPtr conn(new TCPConn(m_eventloop, sockfd));
+
+		TCPConnPtr conn(new TCPConn(m_eventloop, sockfd));	
+		conn->set_message_callback(m_conn_message_cb);
+		conn->on_conn_established();
+
+		m_conn_map.insert(std::make_pair(m_next_conn_id.load(), conn));
+		m_next_conn_id.store(m_next_conn_id.load() + 1);
 	}
 
 }

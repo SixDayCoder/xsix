@@ -1,6 +1,7 @@
 #pragma once
 
 #include "xsix/common_define.h"
+#include "xsix/noncopyable.h"
 #include <string>
 
 //network define
@@ -67,7 +68,7 @@
 #include <fcntl.h>
 #include <poll.h>
 
-typedef int	SOCKET;
+typedef int	int;
 
 #endif
 
@@ -100,37 +101,37 @@ namespace xsix
 
 		void		network_env_cleanup();
 
-		bool		set_socket_opt(SOCKET fd, int32_t socktype, int32_t opname, void* opval, uint32_t oplen);
+		bool		set_socket_opt(int fd, int32_t socktype, int32_t opname, void* opval, uint32_t oplen);
 
 		void		log_socket_error();
 
-		void		close_socket(SOCKET fd);
+		void		close_socket(int fd);
 
-		SOCKET		create_socket(bool use_ipv6 = false);
+		int			create_socket(bool use_ipv6 = false);
 
-		bool		set_nonblock(SOCKET fd, bool on);
+		bool		set_nonblock(int fd, bool on);
 
-		bool		set_reuse_addr(SOCKET fd);
+		bool		set_reuse_addr(int fd);
 
-		bool		set_reuse_port(SOCKET fd);
+		bool		set_reuse_port(int fd);
 
-		bool		set_linger_ex(SOCKET fd, uint32_t linger_time);
+		bool		set_linger_ex(int fd, uint32_t linger_time);
 
-		bool		set_tcp_nodelay(SOCKET fd, bool on);
+		bool		set_tcp_nodelay(int fd, bool on);
 
-		bool		bind_ex(SOCKET fd, uint16_t port, bool use_ipv6 = false);
+		bool		bind_ex(int fd, uint16_t port, bool use_ipv6 = false);
 
-		bool		listen_ex(SOCKET fd, int32_t backlog);
+		bool		listen_ex(int fd, int32_t backlog);
 
-		int32_t		recvbytes(SOCKET fd, char* buffer, int32_t cnt);
+		int32_t		recvbytes(int fd, char* buffer, int32_t cnt);
 
-		int32_t		sendbytes(SOCKET fd, const char* buffer, int32_t cnt);
+		int32_t		sendbytes(int fd, const char* buffer, int32_t cnt);
 
-		void		shutdown_write(SOCKET fd);
+		void		shutdown_write(int fd);
 
-		void		shutdown_read(SOCKET fd);
+		void		shutdown_read(int fd);
 
-		void		shutdown_both(SOCKET fd);
+		void		shutdown_both(int fd);
 
 		bool		is_ipv4_addr(const std::string& ip);
 
@@ -165,27 +166,19 @@ namespace xsix
 		bool						m_ipv6;	
 	};
 
-	class TCPSocket
+	class TCPSocket : public INonCopyable
 	{
 	public:
 
-		explicit TCPSocket(int fd, bool use_ipv6 = false) :
-			m_fd(fd),
-			m_ipv6(use_ipv6) {}
+		explicit TCPSocket(bool use_ipv6 = false) : m_ipv6(use_ipv6) { m_fd = socketapi::create_socket(use_ipv6); }
 
-		explicit TCPSocket(bool use_ipv6 = false) : m_ipv6(use_ipv6)
-		{
-			m_fd = socketapi::create_socket(use_ipv6);
-			XASSERT(m_fd != INVALID_SOCKET);
-		}
+		explicit TCPSocket(int fd, bool use_ipv6 = false) : m_fd(fd), m_ipv6(use_ipv6) {}
 
-		TCPSocket(const TCPSocket& other) = delete;
-
-		TCPSocket& operator = (const TCPSocket& other) = delete;
+		virtual ~TCPSocket() {}
 
 	public:
 
-		SOCKET	get_sockfd() const { return m_fd; };
+		int		get_sockfd() const { return m_fd; };
 
 		bool	set_nonblock(bool on) { return socketapi::set_nonblock(m_fd, on); }
 
@@ -211,7 +204,7 @@ namespace xsix
 
 		bool   m_ipv6;
 
-		SOCKET m_fd;
+		int m_fd;
 	};
 
 	class TCPClientSocket : public TCPSocket
@@ -219,12 +212,6 @@ namespace xsix
 	public:
 
 		explicit TCPClientSocket(bool use_ipv6 = false) : TCPSocket(use_ipv6) {}
-
-		virtual ~TCPClientSocket() {}
-
-		TCPClientSocket(const TCPClientSocket& other) = delete;
-
-		TCPClientSocket& operator = (const TCPClientSocket& other) = delete;
 
 	public:
 
@@ -237,10 +224,6 @@ namespace xsix
 
 		explicit TCPServerSocket(bool use_ipv6 = false) : TCPSocket(use_ipv6), m_port(0) {}
 
-		TCPServerSocket(const TCPServerSocket& other) = delete;
-
-		TCPServerSocket& operator = (const TCPServerSocket& other) = delete;
-
 	public:
 
 		bool	set_reuse_port() { return socketapi::set_reuse_port(m_fd); };
@@ -251,11 +234,10 @@ namespace xsix
 
 		bool	listen_ex(int32_t backlog = XSIX_DEFAULT_LISTEN_BACKLOG) { return socketapi::listen_ex(m_fd, backlog); }
 
-		SOCKET	accept_ex(NetAddr* addr);
+		int		accept_ex(NetAddr* addr);
 
 	private:
 
 		uint16_t m_port;
-
 	};
 }

@@ -74,13 +74,13 @@ namespace xsix
 		return true;
 	}
 
-	SOCKET TCPServerSocket::accept_ex(NetAddr* addr)
+	int TCPServerSocket::accept_ex(NetAddr* addr)
 	{
 		XASSERT(addr);
 		struct sockaddr_storage ss;
 		socklen_t addrsize = m_ipv6 ? sizeof(sockaddr_in6) : sizeof(sockaddr_in);
 
-		SOCKET fd = accept(m_fd, (sockaddr*)(&ss), &addrsize);
+		int fd = accept(m_fd, (sockaddr*)(&ss), &addrsize);
 		if (fd == INVALID_SOCKET)
 		{
 			socketapi::log_socket_error();

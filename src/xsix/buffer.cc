@@ -81,6 +81,17 @@ namespace xsix
 		m_size = m_size;
 	}
 
+	void buffer::clear()
+	{
+		m_tail = m_head = 0;
+	}
+
+	const char* buffer::retieve_all()
+	{
+		neaten();
+		return m_data;
+	}
+
 	int32_t buffer::read_from(const char* src, int32_t size)
 	{
 		XASSERT(src);

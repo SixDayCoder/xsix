@@ -15,25 +15,50 @@ namespace xsix
 
 	class TCPSocket;
 
+	class TCPConn;
+	using TCPConnPtr = std::shared_ptr<TCPConn>;
+
 	class TCPConn : public INonCopyable, public std::enable_shared_from_this<TCPConn>
 	{
 	public:
 
 		enum EState
 		{
-			CONNECTING = 0,
+			Connecting = 0,
+			Connected = 1,
+			Disconnecting = 2,
+			Disconnected = 3,
 		};
+
+	public:
+
+		using MessageCallBack = std::function<void (const xsix::TCPConnPtr&, xsix::buffer*, xsix::Timestamp) >;
 
 	public:
 
 		TCPConn(EventLoop* eventloop, int sockfd);
 
 		~TCPConn();
-
 	
 	public:
 
-		int get_state() const { return m_state; }
+		int	 get_state() const { return m_state; }
+
+		void set_state(int state) { m_state = state; }
+
+	public:
+
+		void set_message_callback(MessageCallBack cb) { m_message_cb = cb; }
+
+	public:
+
+		void send(xsix::buffer* buf);
+
+	public:
+
+		void on_conn_established();
+
+		void on_conn_destoryed();
 
 	private:
 
@@ -58,6 +83,7 @@ namespace xsix
 		xsix::buffer				m_recv_buffer;
 
 		xsix::buffer				m_send_buffer;
+
+		MessageCallBack				m_message_cb;
 	};
-	using TCPConnPtr = std::shared_ptr<TCPConn>;
 }

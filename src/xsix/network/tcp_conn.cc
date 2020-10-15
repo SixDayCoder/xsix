@@ -7,7 +7,7 @@ namespace xsix
 {
 
 	TCPConn::TCPConn(EventLoop* eventloop, int sockfd) :
-				m_state(CONNECTING),
+				m_state(Connecting),
 				m_eventloop(eventloop),
 				m_tcp_socket(new TCPSocket(sockfd)),
 				m_channel(new Channel(eventloop, sockfd))
@@ -24,7 +24,34 @@ namespace xsix
 
 	TCPConn::~TCPConn()
 	{
+		XASSERT(m_state == EState::Disconnected);
 		printf("tcp conn dtor with fd : %d\n", m_tcp_socket->get_sockfd());
+	}
+
+	void TCPConn::send(xsix::buffer* buf)
+	{
+		m_send_buffer.clear();
+		m_send_buffer.read_from(buf->retieve_all(), buf->length());
+		buf->clear();
+		handle_write();
+	}
+
+	void TCPConn::on_conn_established()
+	{
+		XASSERT(m_state == EState::Connecting);
+		set_state(EState::Disconnected);
+
+		m_channel->update_to_eventloop();
+	}
+
+	void TCPConn::on_conn_destoryed()
+	{
+		if (m_state == EState::Connected)
+		{
+			m_channel->disable_read();
+			m_channel->disable_write();
+		}
+		m_channel->remove_from_eventloop();
 	}
 
 	void TCPConn::handle_read()
@@ -44,7 +71,14 @@ namespace xsix
 			return;
 		}
 
-		m_recv_buffer.read_from(buf, rc);
+		rc = m_recv_buffer.read_from(buf, rc);
+		if (rc > 0)
+		{
+			if (m_message_cb)
+			{
+				m_message_cb(shared_from_this(), &m_recv_buffer, Timestamp::now());
+			}		
+		}
 	}
 
 	void TCPConn::handle_write()

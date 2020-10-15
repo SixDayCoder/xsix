@@ -35,6 +35,10 @@ namespace xsix
 
 		void		neaten();
 
+		void		clear();
+
+		const char* retieve_all();
+
 	public:
 
 		int32_t	read_from(const char* src, int32_t size);

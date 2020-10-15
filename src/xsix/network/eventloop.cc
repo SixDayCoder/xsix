@@ -29,7 +29,7 @@ namespace xsix
 		while (!m_quit)
 		{
 			m_active_channel_list.clear();
-			m_poller->poll(1000, &m_active_channel_list);
+			m_poller->poll(10000, &m_active_channel_list);
 
 			m_handling = true;
 			for (Channel* channel : m_active_channel_list)
@@ -40,7 +40,7 @@ namespace xsix
 			m_curr_active_channel = nullptr;
 			m_handling = false;
 
-			run_tick_after_handle_event();
+			//run_tick_after_handle_event();
 		}
 	}
 
