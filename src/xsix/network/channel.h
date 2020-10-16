@@ -3,8 +3,7 @@
 #include "xsix/common_define.h"
 #include "xsix/noncopyable.h"
 #include "xsix/time/timestamp.h"
-
-#include <functional>
+#include "xsix/network/callback_define.h"
 
 namespace xsix
 {
@@ -16,7 +15,12 @@ namespace xsix
 	{
 	public:
 
-		using EventCallBack = std::function<void()>;
+		enum Event
+		{
+			None  = 0,
+			Read  = 1,
+			Write = 2,
+		};
 
 	public:
 
@@ -26,13 +30,15 @@ namespace xsix
 
 	public:
 
-		void	set_read_cb(EventCallBack cb) { m_read_cb = std::move(cb); }
+		void	set_read_cb(ChannelEventCallBack cb) { m_read_cb = std::move(cb); }
 
-		void	set_write_cb(EventCallBack cb) { m_write_cb = std::move(cb); }
+		void	set_write_cb(ChannelEventCallBack cb) { m_write_cb = std::move(cb); }
 
-		void	set_close_cb(EventCallBack cb) { m_close_cb = std::move(cb); }
+		void	set_close_cb(ChannelEventCallBack cb) { m_close_cb = std::move(cb); }
 
-		void	set_error_cb(EventCallBack cb) { m_error_cb = std::move(cb); }
+		void	set_error_cb(ChannelEventCallBack cb) { m_error_cb = std::move(cb); }
+
+		void	set_event(int e) { m_events = e; }
 
 		void    handle_event();
 
@@ -45,6 +51,10 @@ namespace xsix
 		void	enable_write();
 
 		void	disable_write();
+
+		bool	is_reading() const { return m_events & Event::Read; }
+
+		bool	is_writing() const { return m_events & Event::Write; }
 
 	public:
 
@@ -60,20 +70,19 @@ namespace xsix
 
 	public:
 
-		EventLoop*		m_eventloop;
+		EventLoop*				m_eventloop;
 
-		const int		m_fd;
+		const int				m_fd;
 
-		int				m_events;
+		int						m_events;
 
-		EventCallBack	m_read_cb;
+		ChannelEventCallBack	m_read_cb;
 
-		EventCallBack	m_write_cb;
+		ChannelEventCallBack	m_write_cb;
 
-		EventCallBack   m_close_cb;
+		ChannelEventCallBack	m_close_cb;
 
-		EventCallBack	m_error_cb;	
-
+		ChannelEventCallBack	m_error_cb;
 	};
 
 }

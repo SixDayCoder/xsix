@@ -51,6 +51,7 @@ namespace xsix
 			int fd = it->second->get_fd();
 			if (FD_ISSET(fd, &m_read_set))
 			{
+				it->second->set_event(Channel::Event::Read);
 				active_channel_list->push_back(it->second);
 			}
 		}

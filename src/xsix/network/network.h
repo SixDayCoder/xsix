@@ -93,6 +93,7 @@ typedef int	int;
 
 namespace xsix
 {
+
 	namespace socketapi
 	{
 		std::string	get_socket_error_msg();
@@ -204,7 +205,7 @@ namespace xsix
 
 		bool   m_ipv6;
 
-		int m_fd;
+		int		m_fd;
 	};
 
 	class TCPClientSocket : public TCPSocket

@@ -7,6 +7,7 @@ namespace xsix
 	Channel::Channel(EventLoop* eventloop, int fd) : 
 					m_eventloop(eventloop), 
 					m_fd(fd),
+					m_events(Channel::Event::None),
 					m_read_cb(nullptr),
 					m_write_cb(nullptr),
 					m_close_cb(nullptr),
@@ -22,10 +23,14 @@ namespace xsix
 
 	void Channel::handle_event()
 	{
-		//TODO:
-		if(m_read_cb)
+		if (m_events == Channel::Event::Read && m_read_cb)
 		{
 			m_read_cb();
+		}
+
+		if (m_events == Channel::Event::Write && m_write_cb)
+		{
+			m_write_cb();
 		}
 	}
 

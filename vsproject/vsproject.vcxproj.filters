@@ -114,5 +114,8 @@
     <ClInclude Include="..\src\xsix\network\tcp_server.h">
       <Filter>xsix\network</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\xsix\network\callback_define.h">
+      <Filter>xsix\network</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

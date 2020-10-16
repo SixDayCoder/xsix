@@ -116,7 +116,7 @@ namespace xsix
 
 		void log_socket_error()
 		{
-			printf("socket error : %s", get_socket_error_msg().c_str());
+			printf("socket error : %s\n", get_socket_error_msg().c_str());
 		}
 
 		void close_socket(int fd)

@@ -161,6 +161,7 @@
     <ClInclude Include="..\src\xsix\buffer.h" />
     <ClInclude Include="..\src\xsix\common_define.h" />
     <ClInclude Include="..\src\xsix\network\acceptor.h" />
+    <ClInclude Include="..\src\xsix\network\callback_define.h" />
     <ClInclude Include="..\src\xsix\network\channel.h" />
     <ClInclude Include="..\src\xsix\network\eventloop.h" />
     <ClInclude Include="..\src\xsix\network\network.h" />

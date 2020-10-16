@@ -18,7 +18,7 @@ int main()
 
 	xsix::TCPServer tcp_server(&eventloop, 8888);
 
-	tcp_server.set_conn_message_cb(on_echo_message);
+	tcp_server.set_conn_recv_message_cb(on_echo_message);
 
 	tcp_server.run();
 
