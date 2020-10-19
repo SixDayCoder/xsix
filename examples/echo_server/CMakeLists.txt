@@ -26,4 +26,4 @@ set(SRC_FILES ${PROJECT_SOURCE_DIR}/echo_server.cc)
 
 # generate exeutable
 add_executable(echo-server ${SRC_FILES})
-target_link_libraries(echo-server libxsix)
+target_link_libraries(echo-server xsix)

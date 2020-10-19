@@ -1,5 +1,5 @@
 # project name
-project(xsix)
+project(root_xsix)
 
 cmake_minimum_required(VERSION 3.12)
 
@@ -9,8 +9,8 @@ add_definitions(-std=c++11)
 set(CMAKE_C_STANDARD 99)
 
 # output
-message("======system name======" = ${CMAKE_SYSTEM_NAME})
-message("======root project dir======" = ${PROJECT_SOURCE_DIR})
+message("======system name====== : " = ${CMAKE_SYSTEM_NAME})
+message("======root project dir====== : " = ${PROJECT_SOURCE_DIR})
 
 # platform differences
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")

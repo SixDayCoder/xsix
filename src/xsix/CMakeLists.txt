@@ -1,5 +1,5 @@
 # project name
-project(libxsix)
+project(xsix)
 
 # platform differences
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
@@ -41,4 +41,4 @@ set(SRC_FILES
 )
 
 # generate static library
-add_library(libxsix STATIC ${SRC_FILES})
+add_library(xsix STATIC ${SRC_FILES})
