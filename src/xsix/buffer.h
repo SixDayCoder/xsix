@@ -33,11 +33,11 @@ namespace xsix
 
 		bool		empty() const { return m_head == m_tail; }
 
-		void		neaten();
-
 		void		clear();
 
-		const char* retieve_all();
+		const char* retrieve_all();
+
+		std::string retrieve_all_as_string();
 
 	public:
 
@@ -60,6 +60,8 @@ namespace xsix
 		bool resize(int32_t newsize);
 
 		void copy_from(const char* src, int32_t len, int32_t size);
+
+		void neaten();
 
 	private:
 

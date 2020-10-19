@@ -18,15 +18,17 @@ namespace xsix
 		m_channel->set_error_cb(std::bind(&TCPConn::handle_error, this));
 		m_channel->set_close_cb(std::bind(&TCPConn::handle_close, this));
 
-		m_tcp_socket->set_nonblock(true);
+		m_tcp_socket->set_nonblock(true);//非阻塞
+		m_tcp_socket->set_nodelay(true);//nagle,小包合并
+		m_tcp_socket->set_keep_alive();//heartbeat
 
-		printf("[TCPConn] tcp conn ctor with fd : %d\n", m_tcp_socket->get_sockfd());
+		printf("[TCPConn] tcp conn ctor <id : %d, fd : %d>\n", m_id, m_tcp_socket->get_sockfd());
 	}
 
 	TCPConn::~TCPConn()
 	{
 		XASSERT(m_state == EState::Disconnected);
-		printf("[TCPConn] tcp conn dtor with fd : %d\n", m_tcp_socket->get_sockfd());
+		printf("[TCPConn] tcp conn dtor <id : %d, fd : %d>\n", m_id, m_tcp_socket->get_sockfd());
 	}
 
 	const int TCPConn::get_fd() const
@@ -37,16 +39,25 @@ namespace xsix
 	void TCPConn::send(xsix::buffer* buf)
 	{
 		m_send_buffer.clear();
-		m_send_buffer.read_from(buf->retieve_all(), buf->length());
-		buf->clear();
-		handle_write();
-		//TODO:send_in_loop
+		m_send_buffer.read_from(buf->retrieve_all(), buf->length());
+
+		//TODO:
+		m_recv_buffer.clear();
+
+		//TODO:FIXME!!!!replace with send_in_loop
+		if (m_eventloop->is_currthread_in_loopthread())
+		{	
+			handle_write();
+		}
+		else
+		{
+			m_eventloop->run_in_loop(std::bind(&TCPConn::handle_write, this));
+		}	
 	}
 
 	void TCPConn::on_conn_established()
 	{
 		XASSERT(m_state == EState::Connecting);
-
 		set_state(EState::Connected);
 		m_channel->enable_read();
 	}
@@ -60,7 +71,6 @@ namespace xsix
 			m_channel->disable_read();
 			m_channel->disable_write();
 		}
-
 		m_channel->remove_from_eventloop();
 	}
 
@@ -98,15 +108,15 @@ namespace xsix
 		{
 			return;
 		}
-		m_send_buffer.neaten();
-		xsix::socketapi::sendbytes(m_tcp_socket->get_sockfd(), m_send_buffer.buf(), bytes);
+		std::string s = m_send_buffer.retrieve_all_as_string();
+		xsix::socketapi::sendbytes(m_tcp_socket->get_sockfd(), s.c_str(), s.length());
 	}
 
 	void TCPConn::handle_error()
 	{
 		if (m_remove_conn_cb)
 		{
-			printf("[TCPConn] handle error with fd : %d\n", m_tcp_socket->get_sockfd());
+			printf("[TCPConn] handle error <id : %d, fd : %d>\n", m_id, m_tcp_socket->get_sockfd());
 			m_remove_conn_cb(shared_from_this());
 		}
 	}
@@ -115,7 +125,7 @@ namespace xsix
 	{
 		if (m_remove_conn_cb)
 		{
-			printf("[TCPConn] handle close with fd : %d\n", m_tcp_socket->get_sockfd());
+			printf("[TCPConn] handle close <id : %d, fd : %d>\n", m_id, m_tcp_socket->get_sockfd());
 			m_remove_conn_cb(shared_from_this());
 		}
 	}

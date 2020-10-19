@@ -86,10 +86,18 @@ namespace xsix
 		m_tail = m_head = 0;
 	}
 
-	const char* buffer::retieve_all()
+	const char* buffer::retrieve_all()
 	{
 		neaten();
 		return m_data;
+	}
+
+	std::string buffer::retrieve_all_as_string()
+	{
+		neaten();
+		std::string s;	
+		s.assign(m_data, length());
+		return s;
 	}
 
 	int32_t buffer::read_from(const char* src, int32_t size)

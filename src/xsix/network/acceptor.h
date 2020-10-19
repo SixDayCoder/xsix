@@ -13,17 +13,13 @@ namespace xsix
 	{
 	public:
 
-		using NewConnCallBack = std::function<void(int, const NetAddr& addr)>;
-
-	public:
-
 		Acceptor(EventLoop* eventloop, uint16_t listen_port);
 
 		~Acceptor();
 
 	public:
 
-		void set_new_conn_callback(NewConnCallBack cb) { m_new_conn_cb = cb; }
+		void set_new_conn_callback(AcceptNewConnCallBack cb) { m_accept_new_conn_cb = cb; }
 
 		void listen();
 
@@ -33,12 +29,12 @@ namespace xsix
 
 	private:
 
-		EventLoop*		m_eventloop;
+		EventLoop*				m_eventloop;
 
-		TCPServerSocket	m_listen_socket;
+		TCPServerSocket			m_listen_socket;
 
-		Channel			m_accept_channel;
+		Channel					m_accept_channel;
 
-		NewConnCallBack	m_new_conn_cb;
+		AcceptNewConnCallBack	m_accept_new_conn_cb;
 	};
 }

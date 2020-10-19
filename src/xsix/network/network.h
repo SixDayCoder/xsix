@@ -112,6 +112,8 @@ namespace xsix
 
 		bool		set_nonblock(int fd, bool on);
 
+		bool		set_keep_alive(int fd);
+
 		bool		set_reuse_addr(int fd);
 
 		bool		set_reuse_port(int fd);
@@ -184,6 +186,8 @@ namespace xsix
 		bool	set_nonblock(bool on) { return socketapi::set_nonblock(m_fd, on); }
 
 		bool	set_nodelay(bool on) { return socketapi::set_tcp_nodelay(m_fd, on); }
+
+		bool	set_keep_alive() { return socketapi::set_keep_alive(m_fd); }
 
 		bool	is_valid() const { return m_fd != INVALID_SOCKET; }
 

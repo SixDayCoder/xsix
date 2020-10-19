@@ -184,6 +184,12 @@ namespace xsix
 			return false;
 		}
 
+		bool set_keep_alive(int fd)
+		{
+			int32_t opval = 1;
+			return set_socket_opt(fd, SOL_SOCKET, SO_KEEPALIVE, &opval, sizeof(opval));
+		}
+
 		bool set_reuse_addr(int fd)
 		{
 			int32_t opval = 1;

@@ -24,6 +24,7 @@ namespace xsix
 	void TCPServer::run()
 	{
 		m_acceptor->listen();
+		printf("[TCPServer] run\n");
 	}
 
 	void TCPServer::new_conn(int sockfd, const NetAddr& addr)
@@ -32,7 +33,7 @@ namespace xsix
 			sockfd, addr.ipaddress().c_str(), addr.port()
 		);
 
-		TCPConnPtr conn(new TCPConn(m_eventloop, sockfd, m_next_conn_id));	
+		TCPConnPtr conn(new TCPConn(m_eventloop, sockfd, m_next_conn_id));
 		conn->set_recv_message_callback(m_conn_recv_message_cb);
 		conn->set_remove_conn_callback(std::bind(&TCPServer::remove_conn, this, std::placeholders::_1));
 		conn->on_conn_established();

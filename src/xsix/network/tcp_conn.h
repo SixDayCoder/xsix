@@ -54,6 +54,12 @@ namespace xsix
 
 		void send(xsix::buffer* buf);
 
+		void set_nodelay() { m_tcp_socket->set_nodelay(true); }
+
+		void set_nonblock() { m_tcp_socket->set_nonblock(true); }
+
+		void set_keep_alive() { m_tcp_socket->set_keep_alive(); }
+
 	public:
 
 		void on_conn_established();
