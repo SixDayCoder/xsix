@@ -68,8 +68,6 @@
 #include <fcntl.h>
 #include <poll.h>
 
-typedef int	int;
-
 #endif
 
 #ifndef INVALID_SOCKET
@@ -162,6 +160,8 @@ namespace xsix
 		void					set_sockaddr_storage(struct sockaddr_storage ss) { m_ss = ss; }
 
 		struct sockaddr_storage get_sockaddr_storage() const { return m_ss; }
+
+		const sockaddr*			cast_to_sockaddr() const { return (const sockaddr*)(&m_ss); }
 
 	private:
 

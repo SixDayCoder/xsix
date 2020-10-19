@@ -1,8 +1,7 @@
 #pragma once
 
+#include <string.h>
 #include <stdint.h>
-#pragma once
-
 #include <assert.h>
 #include <string>
 #include <vector>

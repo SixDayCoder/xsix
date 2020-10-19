@@ -65,7 +65,7 @@ namespace xsix
 	bool TCPClientSocket::connect_ex(const NetAddr& addr)
 	{
 		int32_t addrsize = addr.get_ipv6() ? sizeof(sockaddr_in6) : sizeof(sockaddr_in);
-		int32_t rc = connect(m_fd, (const sockaddr*)(&addr.get_sockaddr_storage()), addrsize);
+		int32_t rc = connect(m_fd, addr.cast_to_sockaddr(), addrsize);
 		if (rc != 0)
 		{
 			socketapi::log_socket_error();

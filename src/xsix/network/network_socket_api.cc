@@ -326,7 +326,7 @@ namespace xsix
 			return rc == 0 ? true : false;
 		}
 
-		void socketapi::shutdown_write(int fd)
+		void shutdown_write(int fd)
 		{
 #if defined(_XSIX_WINDOWS)
 			shutdown(fd, SD_SEND);
@@ -335,7 +335,7 @@ namespace xsix
 #endif
 		}
 
-		void socketapi::shutdown_read(int fd)
+		void shutdown_read(int fd)
 		{
 #if defined(_XSIX_WINDOWS)
 			shutdown(fd, SD_RECEIVE);
@@ -344,7 +344,7 @@ namespace xsix
 #endif
 		}
 
-		void socketapi::shutdown_both(int fd)
+		void shutdown_both(int fd)
 		{
 #if defined(_XSIX_WINDOWS)
 			shutdown(fd, SD_BOTH);
