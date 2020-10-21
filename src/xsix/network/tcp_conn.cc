@@ -38,21 +38,65 @@ namespace xsix
 
 	void TCPConn::send(xsix::buffer* buf)
 	{
-		m_send_buffer.clear();
-		m_send_buffer.read_from(buf->retrieve_all(), buf->length());
-
-		//TODO:
-		m_recv_buffer.clear();
-
-		//TODO:FIXME!!!!replace with send_in_loop
-		if (m_eventloop->is_currthread_in_loopthread())
-		{	
-			handle_write();
-		}
-		else
+		if (m_state == TCPConn::EState::Connected)
 		{
-			m_eventloop->run_in_loop(std::bind(&TCPConn::handle_write, this));
-		}	
+			if (m_eventloop->is_currthread_in_loopthread())
+			{
+				//sync
+				send_in_loop(buf->retrieve_all_as_string().c_str(), buf->length());
+				buf->clear();
+			}
+			else
+			{
+				//async
+				std::string msg(buf->retrieve_all_as_string());
+				buf->clear();
+				m_eventloop->run_in_loop(std::bind(&TCPConn::send_in_loop, this, msg.c_str(), msg.length()));
+			}
+		}
+	}
+
+	void TCPConn::send_in_loop(const char* data, int len)
+	{
+		/******************************************************************
+		//1.如果channel没有监听写事件,尽可能的向fd写data
+		//2.向fd写data如果有剩余,将剩余数据加到m_send_buffer中,开启监听写事件
+		//3.写完毕后触发write_complete_cb,并且移除写事件
+		*******************************************************************/
+	
+		int nwrite = 0;
+		int remain = 0;
+
+		//没有监听写事件且写缓冲没有数据
+		if (!m_channel->is_writing() && m_send_buffer.length() == 0)
+		{
+			nwrite = socketapi::sendbytes(m_channel->get_fd(), data, len);
+
+			//write success
+			if (nwrite >= 0)
+			{
+				remain = len - nwrite;
+				if (remain == 0 && m_write_complete_cb)
+				{
+					m_eventloop->run_in_loop(std::bind(m_write_complete_cb, shared_from_this()));
+				}
+			}
+			//write error
+			else
+			{
+				//TODO:handle_error
+			}
+		}
+
+		//剩余数据添加到m_send_buffer
+		if (remain > 0)
+		{
+			m_send_buffer.append(data + nwrite, remain);
+			if (!m_channel->is_writing())
+			{
+				m_channel->enable_write();
+			}
+		}
 	}
 
 	void TCPConn::on_conn_established()
@@ -91,7 +135,7 @@ namespace xsix
 			return;
 		}
 
-		rc = m_recv_buffer.read_from(buf, rc);
+		rc = m_recv_buffer.append(buf, rc);
 		if (rc > 0)
 		{
 			if (m_message_cb)
@@ -103,13 +147,39 @@ namespace xsix
 
 	void TCPConn::handle_write()
 	{
-		int32_t bytes = m_send_buffer.length();
-		if (bytes <= 0)
+		if (m_channel->is_writing())
 		{
-			return;
+			std::string msg(m_send_buffer.retrieve_all_as_string());
+			int32_t n = socketapi::sendbytes(m_channel->get_fd(), msg.c_str(), msg.length());
+
+			//write success
+			if (n > 0)
+			{
+				//m_send_buffer中的数据全部发送完
+				if (n == msg.length())
+				{
+					m_channel->disable_write();
+					m_send_buffer.clear();
+
+					if (m_write_complete_cb)
+					{
+						m_eventloop->run_in_loop(std::bind(m_write_complete_cb, shared_from_this()));
+					}
+				}
+				//如果没有全部发完,m_channel还是监听了writing,会在下一次poll之后handle_write
+				//需要维护m_send_buffer的状态
+				else
+				{
+					m_send_buffer.clear();
+					m_send_buffer.append(msg.c_str() + n, msg.length() - n);
+				}
+			}
+			//write error
+			else
+			{
+				//TODO:handle error
+			}
 		}
-		std::string s = m_send_buffer.retrieve_all_as_string();
-		xsix::socketapi::sendbytes(m_tcp_socket->get_sockfd(), s.c_str(), s.length());
 	}
 
 	void TCPConn::handle_error()

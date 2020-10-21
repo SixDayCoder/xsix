@@ -50,9 +50,15 @@ namespace xsix
 
 		void set_remove_conn_callback(TCPRemoveConnCallBack cb) { m_remove_conn_cb = cb; }
 
+		void set_write_complete_callback(TCPWriteCompleteCallBack cb) { m_write_complete_cb; }
+
 	public:
 
 		void send(xsix::buffer* buf);
+
+		void send_in_loop(const char* data, int len);
+
+	public:
 
 		void set_nodelay() { m_tcp_socket->set_nodelay(true); }
 
@@ -95,5 +101,7 @@ namespace xsix
 		TCPRecvMessageCallBack		m_message_cb;
 
 		TCPRemoveConnCallBack       m_remove_conn_cb;
+
+		TCPWriteCompleteCallBack	m_write_complete_cb;
 	};
 }

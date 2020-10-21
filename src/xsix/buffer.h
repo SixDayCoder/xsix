@@ -40,8 +40,8 @@ namespace xsix
 		std::string retrieve_all_as_string();
 
 	public:
-
-		int32_t	read_from(const char* src, int32_t size);
+		
+		int32_t	append(const char* src, int32_t size);
 
 		int32_t	write_to(char* dst, int32_t size);
 

@@ -13,6 +13,7 @@ namespace xsix
 	using TCPConnPtr = std::shared_ptr<TCPConn>;
 	using TCPRecvMessageCallBack = std::function<void(const xsix::TCPConnPtr&, xsix::buffer*, xsix::Timestamp) >;
 	using TCPRemoveConnCallBack = std::function<void(const xsix::TCPConnPtr&)>;
+	using TCPWriteCompleteCallBack = std::function<void(const xsix::TCPConnPtr&)>;
 
 	class Channel;
 	using ChannelEventCallBack = std::function<void()>;

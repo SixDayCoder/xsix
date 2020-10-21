@@ -36,25 +36,25 @@ namespace xsix
 
 	void Channel::enable_read()
 	{
-		//TODO:
+		m_events |= Channel::Event::Read;
 		update_to_eventloop();
 	}
 
 	void Channel::disable_read()
 	{
-		//TODO:
+		m_events &= ~Channel::Event::Read;
 		update_to_eventloop();
 	}
 
 	void Channel::enable_write()
 	{
-		//TODO:
+		m_events |= Channel::Event::Write;
 		update_to_eventloop();
 	}
 
 	void Channel::disable_write()
 	{
-		//TODO:
+		m_events &= ~Channel::Event::Write;
 		update_to_eventloop();
 	}
 

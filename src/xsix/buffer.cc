@@ -100,7 +100,7 @@ namespace xsix
 		return s;
 	}
 
-	int32_t buffer::read_from(const char* src, int32_t size)
+	int32_t buffer::append(const char* src, int32_t size)
 	{
 		XASSERT(src);
 
