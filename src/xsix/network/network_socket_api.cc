@@ -89,6 +89,28 @@ namespace xsix
 
 		}
 
+		int get_socket_error(int fd)
+		{
+#if defined(_XSIX_WINDOWS)
+			int optval = -1;
+			int optlen = sizeof(optval);
+			if (getsockopt(fd, SOL_SOCKET, SO_ERROR, (char*)(&optval), &optlen) < 0)
+			{
+				return WSAGetLastError();
+			}
+			return optval;
+#elif defined(_XSIX_LINUX)
+			int optval = -1;
+			socklen_t optlen = static_cast<socklen_t>(sizeof optval);
+			if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0)
+			{
+				return WSAGetLastError();
+			}
+			return optval;
+#endif
+			return -1;
+		}
+
 		bool set_socket_opt(int fd, int32_t socktype, int32_t opname, void* opval, uint32_t oplen)
 		{
 #if defined(_XSIX_WINDOWS)

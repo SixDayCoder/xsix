@@ -29,11 +29,30 @@ namespace xsix
 	{
 		XASSERT(m_state == EState::Disconnected);
 		printf("[TCPConn] tcp conn dtor <id : %d, fd : %d>\n", m_id, m_tcp_socket->get_sockfd());
+		m_tcp_socket->close();
 	}
 
 	const int TCPConn::get_fd() const
 	{
 		return m_channel->get_fd();
+	}
+
+	void TCPConn::shutdown()
+	{
+		if (m_state == EState::Connected)
+		{
+			set_state(EState::Disconnecting);
+			m_eventloop->run_in_loop(std::bind(&TCPConn::shutdown_in_loop, this));
+		}
+	}
+
+	void TCPConn::shutdown_in_loop()
+	{
+		if (!m_channel->is_writing())
+		{
+			//FIXME:?shutdown_write?
+			m_tcp_socket->shutdown_both();
+		}
 	}
 
 	void TCPConn::send(xsix::buffer* buf)
@@ -177,25 +196,29 @@ namespace xsix
 			//write error
 			else
 			{
-				//TODO:handle error
+				handle_error();
 			}
 		}
 	}
 
 	void TCPConn::handle_error()
 	{
+		int err = socketapi::get_socket_error(m_tcp_socket->get_sockfd());
+		printf("[TCPConn] handle error <id : %d, fd : %d> error id : <%d>\n", m_id, m_tcp_socket->get_sockfd(), err);
 		if (m_remove_conn_cb)
 		{
-			printf("[TCPConn] handle error <id : %d, fd : %d>\n", m_id, m_tcp_socket->get_sockfd());
 			m_remove_conn_cb(shared_from_this());
 		}
 	}
 
 	void TCPConn::handle_close()
 	{
+		set_state(EState::Disconnected);
+		m_channel->disable_read();
+		m_channel->disable_write();
+		printf("[TCPConn] handle close <id : %d, fd : %d>\n", m_id, m_tcp_socket->get_sockfd());
 		if (m_remove_conn_cb)
-		{
-			printf("[TCPConn] handle close <id : %d, fd : %d>\n", m_id, m_tcp_socket->get_sockfd());
+		{	
 			m_remove_conn_cb(shared_from_this());
 		}
 	}

@@ -53,6 +53,12 @@ namespace xsix
 		void set_write_complete_callback(TCPWriteCompleteCallBack cb) { m_write_complete_cb; }
 
 	public:
+		
+		void shutdown();
+
+		void shutdown_in_loop();
+
+	public:
 
 		void send(xsix::buffer* buf);
 

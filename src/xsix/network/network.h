@@ -96,6 +96,8 @@ namespace xsix
 	{
 		std::string	get_socket_error_msg();
 
+		int			get_socket_error(int fd);
+
 		void		network_env_init();
 
 		void		network_env_cleanup();
