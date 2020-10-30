@@ -104,7 +104,7 @@ namespace xsix
 			socklen_t optlen = static_cast<socklen_t>(sizeof optval);
 			if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0)
 			{
-				return WSAGetLastError();
+				return errno;
 			}
 			return optval;
 #endif
