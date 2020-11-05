@@ -5,15 +5,15 @@
 
 namespace xsix
 {
-	class SelectPoller : public Poller
+	class PollPoller : public Poller
 	{
 	public:
 
-		SelectPoller(EventLoop* eventloop);
+		PollPoller(EventLoop* eventloop);
 
 	public:
 
-		virtual Timestamp	poll(int32_t timeout_ms, std::vector<Channel*> *active_channel_list) override;
+		virtual Timestamp	poll(int32_t timeout_ms, std::vector<Channel*>* active_channel_list) override;
 
 		virtual void		update_channel(Channel* channel) override;
 
@@ -21,10 +21,6 @@ namespace xsix
 
 	private:
 
-		fd_set m_read_set;
-
-		fd_set m_write_set;
-
-		fd_set m_except_set;
+		std::vector<struct pollfd> m_pollfd_list;
 	};
 }

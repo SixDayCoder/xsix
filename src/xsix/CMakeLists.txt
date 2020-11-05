@@ -36,6 +36,7 @@ set(SRC_FILES
 	${ROOT_PROJECT_DIR}/src/xsix/network/network_socket_api.cc
 	${ROOT_PROJECT_DIR}/src/xsix/network/poller.cc
 	${ROOT_PROJECT_DIR}/src/xsix/network/poller_select.cc
+	${ROOT_PROJECT_DIR}/src/xsix/network/poller_poll.cc
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_conn.cc
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_server.cc
 )

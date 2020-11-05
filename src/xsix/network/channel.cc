@@ -11,7 +11,8 @@ namespace xsix
 					m_read_cb(nullptr),
 					m_write_cb(nullptr),
 					m_close_cb(nullptr),
-					m_error_cb(nullptr)
+					m_error_cb(nullptr),
+					m_index(-1)
 	{
 
 	}
@@ -34,30 +35,6 @@ namespace xsix
 		}
 	}
 
-	void Channel::enable_read()
-	{
-		m_events |= Channel::Event::Read;
-		update_to_eventloop();
-	}
-
-	void Channel::disable_read()
-	{
-		m_events &= ~Channel::Event::Read;
-		update_to_eventloop();
-	}
-
-	void Channel::enable_write()
-	{
-		m_events |= Channel::Event::Write;
-		update_to_eventloop();
-	}
-
-	void Channel::disable_write()
-	{
-		m_events &= ~Channel::Event::Write;
-		update_to_eventloop();
-	}
-
 	void Channel::update_to_eventloop()
 	{
 		m_eventloop->update_channel(this);
@@ -66,6 +43,19 @@ namespace xsix
 	void Channel::remove_from_eventloop()
 	{
 		m_eventloop->remove_channel(this);
+	}
+
+	void Channel::modify_event(int event_type, int op)
+	{
+		if (op == EventOp::Enable)
+		{
+			m_events |= event_type;
+		}
+		if (op == EventOp::Disable)
+		{
+			m_events &= event_type;
+		}
+		update_to_eventloop();
 	}
 
 }

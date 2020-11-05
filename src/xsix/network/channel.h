@@ -22,6 +22,12 @@ namespace xsix
 			Write = 2,
 		};
 
+		enum EventOp
+		{
+			Enable = 0,
+			Disable = 1,
+		};
+
 	public:
 
 		Channel(EventLoop* eventloop, int fd);
@@ -44,17 +50,23 @@ namespace xsix
 
 	public:
 
-		void	enable_read();
+		void	enable_read()   { modify_event(Channel::Event::Read, Channel::EventOp::Enable); }
 
-		void	disable_read();
+		void	disable_read()  { modify_event(Channel::Event::Read, Channel::EventOp::Disable); }
 
-		void	enable_write();
+		void	enable_write()  { modify_event(Channel::Event::Write, Channel::EventOp::Enable); }
 
-		void	disable_write();
+		void	disable_write() { modify_event(Channel::Event::Write, Channel::EventOp::Disable); }
 
-		bool	is_reading() const { return m_events & Event::Read; }
+		bool	is_enable_read() const { return m_events & Event::Read; }
 
-		bool	is_writing() const { return m_events & Event::Write; }
+		bool	is_enable_write() const { return m_events & Event::Write; }
+
+	public:
+
+		int     get_index() const { return m_index; }
+
+		void	set_index(int index) { m_index = index; }
 
 	public:
 
@@ -64,11 +76,13 @@ namespace xsix
 
 		void		remove_from_eventloop();
 
-	public:
-
 		const int	get_fd() const { return m_fd; }
 
-	public:
+	private:
+
+		void		modify_event(int event_type, int op);
+
+	private:
 
 		EventLoop*				m_eventloop;
 
@@ -83,6 +97,10 @@ namespace xsix
 		ChannelEventCallBack	m_close_cb;
 
 		ChannelEventCallBack	m_error_cb;
+
+	private:
+
+		int						m_index;
 	};
 
 }

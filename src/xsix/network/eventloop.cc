@@ -6,12 +6,22 @@
 namespace xsix
 {
 	
+	static Poller* __default_poller(EventLoop* eventloop)
+	{
+#if   defined (_XSIX_WINDOWS)
+		return new SelectPoller(eventloop);
+#elif defined (_XSIX_LINUX)
+		return new PollPoller(eventloop);
+#endif
+		return new SelectPoller(eventloop);
+	}
+
 	EventLoop::EventLoop() : 
 				m_eventloop_thread_id(std::this_thread::get_id()),
 				m_running(false),
 				m_quit(false),
 				m_curr_active_channel(nullptr),
-				m_poller(new SelectPoller(this))
+				m_poller(__default_poller(this))
 	{
 
 	}

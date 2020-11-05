@@ -48,7 +48,7 @@ namespace xsix
 
 	void TCPConn::shutdown_in_loop()
 	{
-		if (!m_channel->is_writing())
+		if (!m_channel->is_enable_write())
 		{
 			//FIXME:?shutdown_write?
 			m_tcp_socket->shutdown_both();
@@ -87,7 +87,7 @@ namespace xsix
 		int remain = 0;
 
 		//没有监听写事件且写缓冲没有数据
-		if (!m_channel->is_writing() && m_send_buffer.length() == 0)
+		if (!m_channel->is_enable_write() && m_send_buffer.length() == 0)
 		{
 			nwrite = socketapi::sendbytes(m_channel->get_fd(), data, len);
 
@@ -103,7 +103,7 @@ namespace xsix
 			//write error
 			else
 			{
-				//TODO:handle_error
+				handle_error();
 			}
 		}
 
@@ -111,7 +111,7 @@ namespace xsix
 		if (remain > 0)
 		{
 			m_send_buffer.append(data + nwrite, remain);
-			if (!m_channel->is_writing())
+			if (!m_channel->is_enable_write())
 			{
 				m_channel->enable_write();
 			}
@@ -166,7 +166,7 @@ namespace xsix
 
 	void TCPConn::handle_write()
 	{
-		if (m_channel->is_writing())
+		if (m_channel->is_enable_write())
 		{
 			std::string msg(m_send_buffer.retrieve_all_as_string());
 			int32_t n = socketapi::sendbytes(m_channel->get_fd(), msg.c_str(), msg.length());
