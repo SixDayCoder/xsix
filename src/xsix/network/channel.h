@@ -4,6 +4,7 @@
 #include "xsix/noncopyable.h"
 #include "xsix/time/timestamp.h"
 #include "xsix/network/callback_define.h"
+#include "xsix/network/network.h"
 
 namespace xsix
 {

@@ -12,8 +12,8 @@ namespace xsix
 	{
 		m_listen_socket.set_nonblock(true);
 		m_listen_socket.set_reuse_port();
-
 		m_listen_socket.bind_ex(listen_port);
+
 		m_accept_channel.set_read_cb(std::bind(&Acceptor::handle_new_conn, this));
 	}
 
@@ -24,7 +24,9 @@ namespace xsix
 
 	void Acceptor::listen()
 	{
+		m_accept_channel.enable_read();
 		m_accept_channel.update_to_eventloop();
+
 		m_listen_socket.listen_ex();
 	}
 
