@@ -53,7 +53,7 @@ namespace xsix
 		}
 		if (op == EventOp::Disable)
 		{
-			m_events &= event_type;
+			m_events &= (~event_type);
 		}
 		update_to_eventloop();
 	}

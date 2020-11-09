@@ -51,7 +51,7 @@ namespace xsix
 			int fd = it->second->get_fd();
 			if (FD_ISSET(fd, &m_read_set))
 			{
-				it->second->set_event(Channel::Event::Read);
+				it->second->set_events(Channel::Event::Read);
 				active_channel_list->push_back(it->second);
 			}
 		}
@@ -62,26 +62,28 @@ namespace xsix
 	void SelectPoller::update_channel(Channel* channel)
 	{
 		auto it = m_channel_map.find(channel->get_fd());
-		if (it != m_channel_map.end())
+
+		//first add
+		if (it == m_channel_map.end())
 		{
-			return;
+			m_channel_map.insert(std::make_pair(channel->get_fd(), channel));
+			printf("[SelectPoller] add_channel success channel_fd : %d\n", channel->get_fd());
 		}
+		//update
 		else
 		{
 			m_channel_map.insert(std::make_pair(channel->get_fd(), channel));
+			printf("[SelectPoller] update_channel success channel_fd : %d\n", channel->get_fd());
 		}
 	}
 
 	void SelectPoller::remove_channel(Channel* channel)
 	{
 		auto it = m_channel_map.find(channel->get_fd());
-		if (it == m_channel_map.end())
-		{
-			return;
-		}
-		else
+		if (it != m_channel_map.end())
 		{
 			m_channel_map.erase(channel->get_fd());
+			printf("[SelectPoller] remove_channel success channel_fd : %d\n", channel->get_fd());
 		}
 	}
 }

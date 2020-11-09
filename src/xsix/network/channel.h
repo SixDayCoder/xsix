@@ -18,8 +18,8 @@ namespace xsix
 		enum Event
 		{
 			None  = 0,
-			Read  = 1,
-			Write = 2,
+			Read  = (POLLIN | POLLPRI),
+			Write = POLLOUT,
 		};
 
 		enum EventOp
@@ -44,7 +44,9 @@ namespace xsix
 
 		void	set_error_cb(ChannelEventCallBack cb) { m_error_cb = std::move(cb); }
 
-		void	set_event(int e) { m_events = e; }
+		void	set_events(int e) { m_events = e; }
+
+		int		get_events() const { return m_events; }
 
 		void    handle_event();
 

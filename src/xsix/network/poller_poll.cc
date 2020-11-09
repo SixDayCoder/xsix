@@ -38,14 +38,14 @@ namespace xsix
 		for (int32_t i = 0; i < m_pollfd_list.size(); ++i)
 		{
 			const pollfd& pfd = m_pollfd_list[i];
-			//return_events=revents
+			//return_events = revents
 			if (pfd.revents & POLLIN)
 			{
 				auto it = m_channel_map.find(pfd.fd);
 				if (it != m_channel_map.end())
 				{
 					Channel* channel = it->second;
-					channel->set_event(Channel::Event::Read);
+					channel->set_events(Channel::Event::Read);
 					active_channel_list->push_back(channel);
 				}
 			}
@@ -57,31 +57,36 @@ namespace xsix
 
 	void PollPoller::update_channel(Channel* channel)
 	{
-		//TODO:update events
-
 		//first add
 		if (channel->get_index() < 0)
 		{
 			XASSERT(m_channel_map.find(channel->get_fd()) == m_channel_map.end());
+
 			struct pollfd pfd;
 			pfd.fd = channel->get_fd();
-			pfd.events = POLLIN;
+			pfd.events = static_cast<short>(channel->get_events());
 			pfd.revents = 0;
+
 			m_pollfd_list.push_back(pfd);
 			int new_index = (int)(m_pollfd_list.size() - 1);
 			channel->set_index(new_index);
 			m_channel_map.insert(std::make_pair(channel->get_fd(), channel));
+
+			printf("[PollPoller] add_channel success channel : <index : %d, fd : %d>\n", channel->get_index(), channel->get_fd());
 		}
 		//update
 		else
 		{
 			XASSERT(m_channel_map.find(channel->get_fd()) != m_channel_map.end());
 			int index = channel->get_index();
+
 			XASSERT(index >= 0 && index < (int)m_pollfd_list.size());
 			struct pollfd& pfd = m_pollfd_list[index];
 			pfd.fd = channel->get_fd();
-			pfd.events = POLLIN;
-			pfd.revents = 0;	
+			pfd.events = static_cast<short>(channel->get_events());
+			pfd.revents = 0;
+
+			printf("[PollPoller] update_channel success channel : <index : %d, fd : %d>\n", channel->get_index(), channel->get_fd());
 		}
 	}
 
@@ -104,6 +109,8 @@ namespace xsix
 			XASSERT(tmp_channel);
 			tmp_channel->set_index(i);
 		}
+
+		printf("[PollPoller] remove_channel success channel : <index : %d, fd : %d>\n", channel->get_index(), channel->get_fd());
 	}
 
 }
