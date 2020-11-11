@@ -211,7 +211,7 @@ namespace xsix
 
 		bool   m_ipv6;
 
-		int		m_fd;
+		int	   m_fd;
 	};
 
 	class TCPClientSocket : public TCPSocket

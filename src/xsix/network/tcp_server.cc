@@ -1,5 +1,6 @@
 #include "xsix/network/tcp_server.h"
 #include "xsix/network/acceptor.h"
+#include "xsix/log/log_define.h"
 
 namespace xsix
 {
@@ -24,12 +25,12 @@ namespace xsix
 	void TCPServer::run()
 	{
 		m_acceptor->listen();
-		printf("[TCPServer] run\n");
+		xsix::log(LOGGER(TCPServer), "tcpserver run in port(%)", m_acceptor->get_listen_port());
 	}
 
 	void TCPServer::new_conn(int sockfd, const NetAddr& addr)
 	{
-		printf("[TCPServer] new tcp conn established : <sockfd : %d, ip : %s, port : %d>\n", 
+		xsix::log(LOGGER(TCPServer), "new tcp conn established sockfd(%) ip(%) port(%)", 
 			sockfd, addr.ipaddress().c_str(), addr.port()
 		);
 
@@ -44,7 +45,10 @@ namespace xsix
 
 	void TCPServer::remove_conn(const TCPConnPtr& conn)
 	{
-		printf("[TCPServer] remove tcp conn : <id, : %d, sockfd : %d>\n", conn->get_id(), conn->get_fd());
+		xsix::log(LOGGER(TCPServer), "remove tcp conn id(%) sockfd(%)",
+			conn->get_id(), conn->get_fd()
+		);
+
 		m_conn_map.erase(conn->get_id());
 		conn->on_conn_destoryed();
 	}

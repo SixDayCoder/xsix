@@ -1,6 +1,7 @@
 #pragma once
 
 #include "xsix/time/duration.h"
+#include "xsix/fmt.hpp"
 
 namespace xsix
 {
@@ -32,17 +33,30 @@ namespace xsix
 
 		void make_time_val(struct timeval* t) const
 		{
-			t->tv_sec  = (long)(m_ns / Duration::kSecond);
+			t->tv_sec = (long)(m_ns / Duration::kSecond);
 			t->tv_usec = (long)(m_ns % Duration::kSecond) / (long)Duration::kMicrosecond;
 		}
 
-		void	 add(Duration d) { m_ns += d.nanoseconds(); }
+		std::string yymmhhmmss() const
+		{
+			time_t ts = unix();
+			struct tm *t = localtime(&ts);
 
-		int64_t  unix() const { return m_ns / Duration::kSecond; }
+			char buffer[128] = { 0 };
+			strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", t);
 
-		int64_t  unixnano() const { return m_ns; }
+			return std::string(buffer);
+		}
 
-		int64_t  unixmills() const { return m_ns / Duration::kMilliseoncd; }
+	public:
+
+		void	add(Duration d) { m_ns += d.nanoseconds(); }
+
+		int64_t	unix() const { return m_ns / Duration::kSecond; }
+
+		int64_t	unixnano() const { return m_ns; }
+
+		int64_t	unixmills() const { return m_ns / Duration::kMilliseoncd; }
 
 	public:
 

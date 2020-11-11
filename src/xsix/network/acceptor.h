@@ -23,6 +23,8 @@ namespace xsix
 
 		void listen();
 
+		int  get_listen_port() const { return m_listen_port; }
+
 	private:
 
 		void handle_new_conn();
@@ -32,6 +34,8 @@ namespace xsix
 		EventLoop*				m_eventloop;
 
 		TCPServerSocket			m_listen_socket;
+
+		int						m_listen_port;
 
 		Channel					m_accept_channel;
 

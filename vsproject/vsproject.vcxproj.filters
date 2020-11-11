@@ -13,6 +13,9 @@
     <Filter Include="xsix\time">
       <UniqueIdentifier>{3701deb9-f1d4-44f6-b88c-98847d8ae6b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="xsix\log">
+      <UniqueIdentifier>{1fec4632-2a1b-4ba5-89ab-a473983f08c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\xsix\network\network.cc">
@@ -57,6 +60,12 @@
     </ClCompile>
     <ClCompile Include="..\src\xsix\network\poller_poll.cc">
       <Filter>xsix\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\log\log_define.cc">
+      <Filter>xsix\log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xsix\log\logger.cc">
+      <Filter>xsix\log</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,6 +131,18 @@
     </ClInclude>
     <ClInclude Include="..\src\xsix\network\poller_poll.h">
       <Filter>xsix\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\fmt.hpp">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\log\log_define.h">
+      <Filter>xsix\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\array.hpp">
+      <Filter>xsix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\log\logger.h">
+      <Filter>xsix\log</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

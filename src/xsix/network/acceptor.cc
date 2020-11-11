@@ -7,6 +7,7 @@ namespace xsix
 	Acceptor::Acceptor(EventLoop* eventloop, uint16_t listen_port) :
 				m_eventloop(eventloop),
 				m_listen_socket(),
+				m_listen_port(listen_port),
 				m_accept_channel(eventloop, m_listen_socket.get_sockfd()),
 				m_accept_new_conn_cb(nullptr)
 	{

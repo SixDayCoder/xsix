@@ -3,6 +3,7 @@
 #include "xsix/network/poller_select.h"
 #include "xsix/network/poller_poll.h"
 #include "xsix/network/channel.h"
+#include "xsix/log/log_define.h"
 
 namespace xsix
 {
@@ -37,7 +38,8 @@ namespace xsix
 		m_running = true;
 		m_quit = false;
 
-		printf("[EventLoop] run begin in thread : %d\n", m_eventloop_thread_id);
+		xsix::log(LOGGER(EventLoop), "eventloop run");
+
 		while (!m_quit)
 		{
 			m_active_channel_list.clear();
@@ -49,10 +51,11 @@ namespace xsix
 			}
 			m_curr_active_channel = nullptr;
 
-			//run_after_handle_event();
-			//run_pending_func();
+			run_after_handle_event();
+			run_pending_func();
 		}
-		printf("[EventLoop] run quit in thread : %d\n", m_eventloop_thread_id);
+		
+		xsix::log(LOGGER(EventLoop), "eventloop quit");
 	}
 
 	void EventLoop::quit()
@@ -108,10 +111,7 @@ namespace xsix
 
 	void EventLoop::run_after_handle_event()
 	{
-		printf("[EventLoop] run_after_handler_event <ts : %lld, active channel : %d>\n", 
-			xsix::Timestamp::now().unixmills(),
-			m_active_channel_list.size()
-		);
+		LOGGER_MANAGER_FLUSH;
 	}
 
 	void EventLoop::run_pending_func()
@@ -122,15 +122,15 @@ namespace xsix
 			funcs.swap(m_pending_func);
 		}
 
-		printf("[EventLoop] run_pending_func        <ts : %lld, pending_func_size : %d>\n",
-			xsix::Timestamp::now().unixmills(),
-			funcs.size()
-		);
-
 		for (const EventLoopFunc& func : funcs)
 		{
 			func();
 		}
+
+		//xsix::log(LOGGER(EventLoop), "run_pending_func pending_func_size : %",
+		//	xsix::Timestamp::now().unixmills(),
+		//	funcs.size()
+		//);
 	}
 
 }

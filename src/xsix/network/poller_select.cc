@@ -1,6 +1,7 @@
 #include "xsix/network/poller_select.h"
 #include "xsix/network/channel.h"
 #include "xsix/network/eventloop.h"
+#include "xsix/log/log_define.h"
 
 namespace xsix
 {
@@ -67,13 +68,7 @@ namespace xsix
 		if (it == m_channel_map.end())
 		{
 			m_channel_map.insert(std::make_pair(channel->get_fd(), channel));
-			printf("[SelectPoller] add_channel success channel_fd : %d\n", channel->get_fd());
-		}
-		//update
-		else
-		{
-			m_channel_map.insert(std::make_pair(channel->get_fd(), channel));
-			printf("[SelectPoller] update_channel success channel_fd : %d\n", channel->get_fd());
+			xsix::log(LOGGER(Poller), "add channel success channel_fd(%)", channel->get_fd());
 		}
 	}
 
@@ -83,7 +78,7 @@ namespace xsix
 		if (it != m_channel_map.end())
 		{
 			m_channel_map.erase(channel->get_fd());
-			printf("[SelectPoller] remove_channel success channel_fd : %d\n", channel->get_fd());
+			xsix::log(LOGGER(Poller), "remove channel success channel_fd(%)", channel->get_fd());
 		}
 	}
 }

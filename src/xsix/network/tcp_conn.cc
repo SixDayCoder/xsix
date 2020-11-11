@@ -1,7 +1,7 @@
 #include "xsix/network/tcp_conn.h"
 #include "xsix/network/eventloop.h"
 #include "xsix/network/channel.h"
-#include <stdio.h>
+#include "xsix/log/log_define.h"
 
 namespace xsix
 {
@@ -22,13 +22,13 @@ namespace xsix
 		m_tcp_socket->set_nodelay(true);//nagle,小包合并
 		m_tcp_socket->set_keep_alive();//heartbeat
 
-		printf("[TCPConn] tcp conn ctor <id : %d, fd : %d>\n", m_id, m_tcp_socket->get_sockfd());
+		xsix::log(LOGGER(TCPServer), "tcp conn ctor id(%) fd(%)", m_id, m_tcp_socket->get_sockfd());
 	}
 
 	TCPConn::~TCPConn()
 	{
 		XASSERT(m_state == EState::Disconnected);
-		printf("[TCPConn] tcp conn dtor <id : %d, fd : %d>\n", m_id, m_tcp_socket->get_sockfd());
+		xsix::log(LOGGER(TCPServer), "tcp conn dtor id(%) fd(%)", m_id, m_tcp_socket->get_sockfd());
 		m_tcp_socket->close();
 	}
 
@@ -50,7 +50,7 @@ namespace xsix
 	{
 		if (!m_channel->is_enable_write())
 		{
-			//FIXME:?shutdown_write?
+			//TODO:?shutdown_write?
 			m_tcp_socket->shutdown_both();
 		}
 	}
@@ -204,11 +204,11 @@ namespace xsix
 	void TCPConn::handle_error()
 	{
 		int err = socketapi::get_socket_error(m_tcp_socket->get_sockfd());
-		printf("[TCPConn] handle error <id : %d, fd : %d> error id : <%d>\n", m_id, m_tcp_socket->get_sockfd(), err);
+		xsix::log(LOGGER(TCPServer), "tcp conn handle error id(%) fd(%) error(%)", m_id, m_tcp_socket->get_sockfd(), err);
 		if (m_remove_conn_cb)
 		{
 			m_remove_conn_cb(shared_from_this());
-		}
+		}	
 	}
 
 	void TCPConn::handle_close()
@@ -216,7 +216,7 @@ namespace xsix
 		set_state(EState::Disconnected);
 		m_channel->disable_read();
 		m_channel->disable_write();
-		printf("[TCPConn] handle close <id : %d, fd : %d>\n", m_id, m_tcp_socket->get_sockfd());
+		xsix::log(LOGGER(TCPServer), "tcp conn handle close id(%) fd(%)", m_id, m_tcp_socket->get_sockfd());
 		if (m_remove_conn_cb)
 		{	
 			m_remove_conn_cb(shared_from_this());

@@ -88,7 +88,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>26495;6319;6262</DisableSpecificWarnings>
+      <DisableSpecificWarnings>26495;6319;6262;28182;6011</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,6 +141,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\xsix\buffer.cc" />
+    <ClCompile Include="..\src\xsix\log\logger.cc" />
+    <ClCompile Include="..\src\xsix\log\log_define.cc" />
     <ClCompile Include="..\src\xsix\network\acceptor.cc" />
     <ClCompile Include="..\src\xsix\network\channel.cc" />
     <ClCompile Include="..\src\xsix\network\eventloop.cc" />
@@ -157,10 +159,14 @@
     <ClCompile Include="main.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\xsix\array.hpp" />
     <ClInclude Include="..\src\xsix\bits.hpp" />
     <ClInclude Include="..\src\xsix\block_queue.hpp" />
     <ClInclude Include="..\src\xsix\buffer.h" />
     <ClInclude Include="..\src\xsix\common_define.h" />
+    <ClInclude Include="..\src\xsix\fmt.hpp" />
+    <ClInclude Include="..\src\xsix\log\logger.h" />
+    <ClInclude Include="..\src\xsix\log\log_define.h" />
     <ClInclude Include="..\src\xsix\network\acceptor.h" />
     <ClInclude Include="..\src\xsix\network\callback_define.h" />
     <ClInclude Include="..\src\xsix\network\channel.h" />

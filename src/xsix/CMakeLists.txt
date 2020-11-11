@@ -23,9 +23,13 @@ link_directories(/usr/local/lib)
 # find src files
 # aux_source_directory(${ROOT_PROJECT_DIR}/src LIBXSIX_SRC_FILES)
 set(SRC_FILES 
+	${ROOT_PROJECT_DIR}/src/xsix/array.hpp
 	${ROOT_PROJECT_DIR}/src/xsix/bits.hpp
 	${ROOT_PROJECT_DIR}/src/xsix/block_queue.hpp
 	${ROOT_PROJECT_DIR}/src/xsix/buffer.cc
+	${ROOT_PROJECT_DIR}/src/xsix/fmt.hpp
+	${ROOT_PROJECT_DIR}/src/xsix/log/logger.cc
+	${ROOT_PROJECT_DIR}/src/xsix/log/log_define.cc
 	${ROOT_PROJECT_DIR}/src/xsix/utils/file_utils.cc
 	${ROOT_PROJECT_DIR}/src/xsix/utils/math_utils.cc
 	${ROOT_PROJECT_DIR}/src/xsix/utils/string_utils.cc

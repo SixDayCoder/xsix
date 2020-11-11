@@ -1,6 +1,7 @@
 #include "xsix/network/poller_poll.h"
 #include "xsix/network/channel.h"
 #include "xsix/network/eventloop.h"
+#include "xsix/log/log_define.h"
 
 namespace xsix
 {
@@ -72,7 +73,7 @@ namespace xsix
 			channel->set_index(new_index);
 			m_channel_map.insert(std::make_pair(channel->get_fd(), channel));
 
-			printf("[PollPoller] add_channel success channel : <index : %d, fd : %d>\n", channel->get_index(), channel->get_fd());
+			xsix::log(LOGGER(Poller), "add_channel success channel index(%) fd(%)", channel->get_index(), channel->get_fd());
 		}
 		//update
 		else
@@ -86,7 +87,7 @@ namespace xsix
 			pfd.events = static_cast<short>(channel->get_events());
 			pfd.revents = 0;
 
-			printf("[PollPoller] update_channel success channel : <index : %d, fd : %d>\n", channel->get_index(), channel->get_fd());
+			xsix::log(LOGGER(Poller), "update_channel success channel index(%) fd(%)", channel->get_index(), channel->get_fd());
 		}
 	}
 
@@ -110,7 +111,7 @@ namespace xsix
 			tmp_channel->set_index(i);
 		}
 
-		printf("[PollPoller] remove_channel success channel : <index : %d, fd : %d>\n", channel->get_index(), channel->get_fd());
+		xsix::log(LOGGER(Poller), "remove_channel success channel index(%) fd(%)", channel->get_index(), channel->get_fd());
 	}
 
 }
