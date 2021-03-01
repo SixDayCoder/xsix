@@ -67,6 +67,9 @@
     <ClCompile Include="..\src\xsix\log\logger.cc">
       <Filter>xsix\log</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\xsix\network\poller_epoll.cc">
+      <Filter>xsix\network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\xsix\network\network.h">
@@ -143,6 +146,9 @@
     </ClInclude>
     <ClInclude Include="..\src\xsix\log\logger.h">
       <Filter>xsix\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xsix\network\poller_epoll.h">
+      <Filter>xsix\network</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

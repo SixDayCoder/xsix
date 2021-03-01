@@ -149,6 +149,7 @@
     <ClCompile Include="..\src\xsix\network\network.cc" />
     <ClCompile Include="..\src\xsix\network\network_socket_api.cc" />
     <ClCompile Include="..\src\xsix\network\poller.cc" />
+    <ClCompile Include="..\src\xsix\network\poller_epoll.cc" />
     <ClCompile Include="..\src\xsix\network\poller_poll.cc" />
     <ClCompile Include="..\src\xsix\network\poller_select.cc" />
     <ClCompile Include="..\src\xsix\network\tcp_conn.cc" />
@@ -173,6 +174,7 @@
     <ClInclude Include="..\src\xsix\network\eventloop.h" />
     <ClInclude Include="..\src\xsix\network\network.h" />
     <ClInclude Include="..\src\xsix\network\poller.h" />
+    <ClInclude Include="..\src\xsix\network\poller_epoll.h" />
     <ClInclude Include="..\src\xsix\network\poller_poll.h" />
     <ClInclude Include="..\src\xsix\network\poller_select.h" />
     <ClInclude Include="..\src\xsix\network\tcp_conn.h" />
