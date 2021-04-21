@@ -10,6 +10,7 @@
 #include <list>
 #include <map>
 #include <algorithm>
+#include <array>
 #include <stdio.h>
 
 namespace xsix
@@ -34,7 +35,7 @@ namespace xsix
 
 	public:
 
-		int				   get_logger_count() const { return m_logger_map.size(); }
+		std::size_t		   get_logger_count() const { return m_logger_map.size(); }
 
 		const std::string& get_log_root_path() const { return m_log_root_path; }
 
@@ -49,7 +50,7 @@ namespace xsix
 	{
 	private:
 
-		using CacheBlock = xsix::xarray<char, 1024 * 1024>;
+		using CacheBlock = std::array<char, 1024 * 1024>;
 
 		using CacheBlockPtr = std::shared_ptr<CacheBlock>;
 

@@ -9,8 +9,8 @@ namespace xsix
 	public:
 
 		xarray() : m_length(0) {}
-
 		~xarray() = default;
+
 
 	public:
 

@@ -4,6 +4,8 @@ project(xsix)
 # platform differences
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         add_definitions(-D _XSIX_LINUX)
+		# pthread
+		find_package (Threads)
 endif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 if(WIN32)
@@ -14,8 +16,10 @@ if(UNIX)
         add_definitions(-D _XSIX_LINUX)
 endif(UNIX)
 
+
 # add include dirs
 include_directories(${ROOT_PROJECT_DIR}/src)
+include_directories(${THIRD_ASIO_DIR}/include)
 
 # add link dirs
 link_directories(/usr/local/lib)
@@ -30,18 +34,8 @@ set(SRC_FILES
 	${ROOT_PROJECT_DIR}/src/xsix/fmt.hpp
 	${ROOT_PROJECT_DIR}/src/xsix/log/logger.cc
 	${ROOT_PROJECT_DIR}/src/xsix/log/log_define.cc
-	${ROOT_PROJECT_DIR}/src/xsix/utils/file_utils.cc
 	${ROOT_PROJECT_DIR}/src/xsix/utils/math_utils.cc
 	${ROOT_PROJECT_DIR}/src/xsix/utils/string_utils.cc
-	${ROOT_PROJECT_DIR}/src/xsix/network/acceptor.cc
-	${ROOT_PROJECT_DIR}/src/xsix/network/channel.cc
-	${ROOT_PROJECT_DIR}/src/xsix/network/eventloop.cc
-	${ROOT_PROJECT_DIR}/src/xsix/network/network.cc
-	${ROOT_PROJECT_DIR}/src/xsix/network/network_socket_api.cc
-	${ROOT_PROJECT_DIR}/src/xsix/network/poller.cc
-	${ROOT_PROJECT_DIR}/src/xsix/network/poller_select.cc
-	${ROOT_PROJECT_DIR}/src/xsix/network/poller_poll.cc
-	${ROOT_PROJECT_DIR}/src/xsix/network/poller_epoll.cc
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_conn.cc
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_server.cc
 )

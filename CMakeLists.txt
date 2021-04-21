@@ -30,14 +30,21 @@ endif(UNIX)
 # set root dir
 set(ROOT_PROJECT_DIR ${PROJECT_SOURCE_DIR})
 
+# set 3rd asio dir
+set(THIRD_ASIO_DIR ${PROJECT_SOURCE_DIR}/3rd/asio)
+message("======asio dir====== : " = ${THIRD_ASIO_DIR})
+
 # set binary dir
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+message("======executable output path====== : " = ${EXECUTABLE_OUTPUT_PATH})
 
 # set lib dir
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+message("======lib output path====== : " = ${LIBRARY_OUTPUT_PATH})
 
 # add include dirs
 include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${THIRD_DIR}/asio/include)
 
 # add link dirs
 # link_directories(/usr/local/protobuf/lib)

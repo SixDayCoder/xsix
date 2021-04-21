@@ -16,6 +16,7 @@ endif(UNIX)
 
 # add include dirs
 include_directories(${ROOT_PROJECT_DIR}/src)
+include_directories(${THIRD_ASIO_DIR}/include)
 
 # add link dirs
 link_directories(/usr/local/lib)

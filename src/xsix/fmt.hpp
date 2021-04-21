@@ -84,7 +84,7 @@ namespace xsix
 	template<typename T, typename ...Args>
 	void fmt(char* buf, int buf_size, const char* format, T val, Args ...args)
 	{
-		int format_size = strlen(format);
+		auto format_size = strlen(format);
 		if (format_size <= 0 || buf_size <= 0)
 		{
 			return;
