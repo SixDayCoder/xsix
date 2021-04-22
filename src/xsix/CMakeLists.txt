@@ -4,8 +4,6 @@ project(xsix)
 # platform differences
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         add_definitions(-D _XSIX_LINUX)
-		# pthread
-		find_package (Threads)
 endif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 if(WIN32)
@@ -27,7 +25,7 @@ link_directories(/usr/local/lib)
 # find src files
 # aux_source_directory(${ROOT_PROJECT_DIR}/src LIBXSIX_SRC_FILES)
 set(SRC_FILES 
-	${ROOT_PROJECT_DIR}/src/xsix/array.hpp
+	
 	${ROOT_PROJECT_DIR}/src/xsix/bits.hpp
 	${ROOT_PROJECT_DIR}/src/xsix/block_queue.hpp
 	${ROOT_PROJECT_DIR}/src/xsix/buffer.cc
@@ -37,8 +35,10 @@ set(SRC_FILES
 	${ROOT_PROJECT_DIR}/src/xsix/utils/math_utils.cc
 	${ROOT_PROJECT_DIR}/src/xsix/utils/string_utils.cc
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_conn.cc
+	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_conn_manager.cc
+	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_client.cc
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_server.cc
 )
 
 # generate static library
-add_library(xsix STATIC ${SRC_FILES})
+add_library(xsix STATIC ${SRC_FILES} "network/tcp_conn_manager.h" "network/tcp_client.h")

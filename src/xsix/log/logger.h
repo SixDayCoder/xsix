@@ -1,7 +1,6 @@
 #pragma once
 
 #include "xsix/noncopyable.h"
-#include "xsix/array.hpp"
 #include "xsix/fmt.hpp"
 #include "xsix/time/timestamp.h"
 

@@ -154,7 +154,7 @@ namespace xsix
 			memcpy(&m_data[m_tail], src, size);
 		}
 
-		m_tail = (m_tail + size) % m_size;
+		m_tail = (m_tail + size - 1) % m_size;
 		return size;
 	}
 
