@@ -15,48 +15,42 @@ namespace xsix
 		m_tcp_acceptor.set_option(option);
 	}
 
-	void TCPServer::default_accept_handler(TCPConnPtr connptr, const asio::error_code& ec)
-	{
-		m_tcp_conn_mgr.add_conn(connptr);
-
-		printf("new conn (id:%d, ip:%s, port:%d)\n", 
-			connptr->get_id(), 
-			connptr->ip().c_str(), 
-			connptr->port()
-		);
-
-		TCPConnPtr newconn(new TCPConn(m_ctx));
-		newconn->set_on_close(std::bind(&TCPServer::on_conn_close, this, std::placeholders::_1));
-		m_tcp_acceptor.async_accept(newconn->socket(),
-			std::bind(&TCPServer::default_accept_handler, this, newconn, std::placeholders::_1)
-		);
-	}
-
-	void TCPServer::on_conn_close(TCPConnPtr ptr)
-	{
-		if (ptr)
-		{
-			m_tcp_conn_mgr.remove_conn(ptr->get_id());
-		}
-	}
-
 	void TCPServer::accept()
 	{
-		TCPConnPtr ptr(new TCPConn(m_ctx));
-		ptr->set_on_close(std::bind(&TCPServer::on_conn_close, this, std::placeholders::_1));
+		auto self(shared_from_this());
 
-		if (m_accept_handler)
-		{
-			m_tcp_acceptor.async_accept(ptr->socket(),
-				std::bind(m_accept_handler, ptr, std::placeholders::_1)
-			);
-		}
-		else
-		{
-			m_tcp_acceptor.async_accept(ptr->socket(),
-				std::bind(&TCPServer::default_accept_handler, this, ptr, std::placeholders::_1)
-			);
-		}
+		TCPConnPtr conn(new TCPConn(m_ctx));	
+		conn->set_message_handler(m_conn_message_handler);
+		conn->set_close_handler([self](TCPConnPtr ptr, const asio::error_code& ec) {
+			if (!self || !ptr)
+			{
+				return;
+			}
+			self->m_tcp_conn_mgr.remove_conn(ptr->get_id());
+			if (self->m_conn_close_handler)
+			{
+				self->m_conn_close_handler(ptr, ec);
+			}
+		});
+
+		//fire another accept events
+		m_tcp_acceptor.async_accept(conn->socket(),
+			[self, conn](const asio::error_code& ec) {
+				if (!self || !conn)
+				{
+					return;
+				}
+				if (!ec)
+				{
+					self->m_tcp_conn_mgr.add_conn(conn);
+					if (self->m_accept_handler)
+					{
+						self->m_accept_handler(self, conn, ec);
+					}
+					conn->start();
+				}
+			}
+		);
 	}
 
 	void TCPServer::loop()
@@ -69,12 +63,12 @@ namespace xsix
 
 	void TCPServer::tick()
 	{
-		//run for accept new connection
-		std::size_t executed_events_count = m_ctx.run_for(std::chrono::milliseconds(20));
-		printf("events : %d  conns : %d\n", executed_events_count, m_tcp_conn_mgr.m_tcp_conn_map.size());
+		//poll for async_accept/conntions async_recv/async_send
+		auto executed_events = m_ctx.poll();
 
-		//tick 
-		for (auto it = m_tcp_conn_mgr.m_tcp_conn_map.begin(); it != m_tcp_conn_mgr.m_tcp_conn_map.end(); it++)
+		//connection tick 
+		for (auto it = m_tcp_conn_mgr.m_tcp_conn_map.begin(); 
+				  it != m_tcp_conn_mgr.m_tcp_conn_map.end(); it++)
 		{
 			it->second->tick();
 		}

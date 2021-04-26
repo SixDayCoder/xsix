@@ -2,48 +2,26 @@
 
 namespace xsix
 {
-	void TCPConn::send(const char* msg, std::size_t msgsize)
+
+	void TCPConn::start()
 	{
-		if (msg && m_tcp_socket.is_open())
-		{
-			m_send_buffer.append(msg, msgsize);
-		}
+		async_recv();
 	}
 
 	void TCPConn::tick()
 	{
-		if (!m_tcp_socket.is_open())
-		{
-			return;
-		}
-
-		//https://www.boost.org/doc/libs/1_36_0/doc/html/boost_asio/example/echo/async_tcp_echo_server.cpp
-		async_recv();
-		default_msg_process(m_recv_buffer);
-		async_send();
-	}
-
-	void TCPConn::default_msg_process(xsix::buffer& msgbuffer)
-	{
-		std::string msg = msgbuffer.retrieve_all_as_string();
-		msgbuffer.clear();
-		if (msg.size() > 0)
-		{
-			printf("tcp conn id : %d, recv : %s\n", get_id(), msg.c_str());
-
-			//TODO: echo test
-			send(msg.c_str(), msg.size());
-		}
+		handle_message();
+		block_send();
 	}
 
 	void TCPConn::handle_disconnect()
 	{
-		printf("client closed!\n");
-		m_tcp_socket.close();
+		auto self(shared_from_this());
 		if (m_close_handler)
 		{
-			m_close_handler(shared_from_this());
+			m_close_handler(self, asio::error::connection_reset);
 		}
+		m_tcp_socket.close();
 	}
 
 	void TCPConn::handle_error(const asio::error_code& ec)
@@ -60,12 +38,12 @@ namespace xsix
 		}
 		else
 		{
-			printf("handle error : %s\n", ec.message().c_str());
-			m_tcp_socket.close();
+			auto self(shared_from_this());
 			if (m_close_handler)
 			{
-				m_close_handler(shared_from_this());
+				m_close_handler(self, ec);
 			}
+			m_tcp_socket.close();
 		}
 	}
 
@@ -85,8 +63,19 @@ namespace xsix
 					return;
 				}
 				m_recv_buffer.append(buf, bytes);
+
+				//fire another event
+				async_recv();
 			}
 		);
+	}
+
+	void TCPConn::handle_message()
+	{
+		if (m_message_handler)
+		{
+			m_message_handler(shared_from_this());
+		}
 	}
 
 	void TCPConn::async_send()
@@ -99,15 +88,33 @@ namespace xsix
 		std::string msg = m_send_buffer.retrieve_all_as_string();
 		m_send_buffer.clear();
 
-		asio::async_write(m_tcp_socket, asio::buffer(msg),
-			[&](const asio::error_code& ec, std::size_t bytes) {
-				if (ec)
-				{
-					handle_error(ec);
-					return;
+		if (msg.size() > 0)
+		{
+			asio::async_write(m_tcp_socket, asio::buffer(msg),
+				[&](const asio::error_code& ec, std::size_t bytes) {
+					if (ec)
+					{
+						handle_error(ec);
+						return;
+					}
 				}
-			}
-		);
+			);
+		}
 	}
 
+	void TCPConn::block_send()
+	{
+		if (!m_tcp_socket.is_open())
+		{
+			return;
+		}
+
+		std::string msg = m_send_buffer.retrieve_all_as_string();
+		m_send_buffer.clear();
+
+		if (msg.size() > 0)
+		{
+			asio::write(m_tcp_socket, asio::buffer(msg));
+		}
+	}
 }

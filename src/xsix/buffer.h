@@ -29,13 +29,11 @@ namespace xsix
 
 	public:
 
-		const char* buf() { return m_data; }
+		const char* buf() { neaten();  return m_data; }
 
 		bool		empty() const { return m_head == m_tail; }
 
 		void		clear();
-
-		const char* retrieve_all();
 
 		std::string retrieve_all_as_string();
 
@@ -49,7 +47,7 @@ namespace xsix
 
 		int32_t	size() const { return m_size; }
 
-		int32_t	get_free_size() const  { return ((m_head <= m_tail) ? (m_size - m_tail + m_head - 1) : (m_head - m_tail - 1)); }
+		int32_t	get_free_size() const { return m_size - length(); }
 
 	private:
 

@@ -12,11 +12,17 @@
 
 namespace xsix
 {
-	class TCPServer
+	class TCPServer;
+	using TCPServerPtr = std::shared_ptr<TCPServer>;
+
+	class TCPServer : public xsix::INonCopyable,
+					  public std::enable_shared_from_this<TCPServer>
 	{
 	public:
 
-		using AcceptFuncHandler = std::function<void(TCPConnPtr, const asio::error_code& ec)>;
+		using AcceptHandler = std::function<void(TCPServerPtr server, TCPConnPtr conn, const asio::error_code& ec)>;
+		using ConnMessageHandler = std::function<void(TCPConnPtr ptr)>;
+		using ConnCloseHandler = std::function<void(TCPConnPtr ptr, const asio::error_code& ec)>;
 
 	public:
 
@@ -26,19 +32,23 @@ namespace xsix
 
 		void set_reuse_addr(bool reuse);
 
-		void set_accept_handler(AcceptFuncHandler handler) { m_accept_handler = handler; }
-
 		void accept();
 
 		void loop();
 
 		void tick();
 
-	private:
+	public:
 
-		void default_accept_handler(TCPConnPtr connptr, const asio::error_code& ec);
+		void set_accept_handler(AcceptHandler handler) { m_accept_handler = handler; }
 
-		void on_conn_close(TCPConnPtr ptr);
+		void set_conn_message_handler(ConnMessageHandler handler) { m_conn_message_handler = handler; }
+
+		void set_conn_close_handler(ConnCloseHandler handler) { m_conn_close_handler = handler; }
+		
+	public:
+
+		asio::io_context& ctx() { return m_ctx; }
 
 	private:
 
@@ -47,7 +57,9 @@ namespace xsix
 		asio::ip::tcp::acceptor m_tcp_acceptor;
 		xsix::TCPConnManager	m_tcp_conn_mgr;
 
-		AcceptFuncHandler		m_accept_handler;
+		AcceptHandler			m_accept_handler;
+		ConnMessageHandler	    m_conn_message_handler;
+		ConnCloseHandler		m_conn_close_handler;
 	};
 
 }

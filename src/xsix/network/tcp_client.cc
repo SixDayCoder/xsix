@@ -1,4 +1,8 @@
 #include "tcp_client.h"
+#include <cassert>
+#include <ctime>
+#include <exception>
+#include <iostream>
 
 namespace xsix
 {
@@ -7,7 +11,37 @@ namespace xsix
 
 	void TCPClient::connect(asio::ip::tcp::endpoint ep)
 	{
-		m_tcp_socket.connect(ep);
+		auto self(shared_from_this());
+		asio::error_code ec;
+		m_tcp_socket.connect(ep, ec);
+		if (ec)
+		{
+			throw std::runtime_error(ec.message());
+		}
+		else
+		{
+			m_tcp_socket.non_blocking(true);
+			if (m_connected_handler)
+			{
+				m_connected_handler(self);
+			}
+		}
+	}
+
+	void TCPClient::async_connect(asio::ip::tcp::endpoint ep)
+	{
+		auto self(shared_from_this());
+		m_tcp_socket.async_connect(ep, [self](const asio::error_code& ec) {
+			if (ec)
+			{
+				throw std::runtime_error(ec.message());
+			}
+			if (self->m_connected_handler)
+			{
+				self->m_connected_handler(self);
+			}
+			}
+		);
 	}
 
 	void TCPClient::send(const char* msg, std::size_t msgsize)
@@ -18,6 +52,49 @@ namespace xsix
 		}
 	}
 
+	void TCPClient::async_recv()
+	{
+		if (!m_tcp_socket.is_open())
+		{
+			return;
+		}
+		char buf[4096] = { 0 };
+		m_tcp_socket.async_read_some(asio::buffer(buf),
+			[&](const asio::error_code& ec, std::size_t bytes) {
+				if (ec)
+				{
+					handle_error(ec);
+					return;
+				}
+				m_recv_buffer.append(buf, bytes);
+			}
+		);
+	}
+
+	void TCPClient::async_send()
+	{
+		if (!m_tcp_socket.is_open())
+		{
+			return;
+		}
+
+		std::string msg = m_send_buffer.retrieve_all_as_string();
+		m_send_buffer.clear();
+
+		if (msg.size() > 0)
+		{
+			asio::async_write(m_tcp_socket, asio::buffer(msg),
+				[&](const asio::error_code& ec, std::size_t bytes) {
+					if (ec)
+					{
+						handle_error(ec);
+						return;
+					}
+				}
+			);
+		}
+	}
+
 	void TCPClient::recv()
 	{
 		if (!m_tcp_socket.is_open())
@@ -25,41 +102,48 @@ namespace xsix
 			return;
 		}
 
+		char bytes[4096] = { 0 };
 		asio::error_code ec;
-		std::size_t can_read = m_tcp_socket.available(ec);
+		std::size_t nread = m_tcp_socket.read_some(asio::buffer(bytes), ec);
 		if (ec)
 		{
-			handle_error(ec);
-			return;
-		}
-
-		if (can_read > 0)
-		{
-			char bytes[4096] = { 0 };
-			std::size_t nread = m_tcp_socket.read_some(asio::buffer(bytes), ec);	
-			if (ec)
+			if (ec != asio::error::would_block)
 			{
 				handle_error(ec);
-				return;
 			}
+			return;
+		}
+		if (nread > 0)
+		{
 			m_recv_buffer.append(bytes, nread);
 		}
 	}
 
-	void TCPClient::send_buffered_msg()
-	{
-		if (m_tcp_socket.is_open())
+	void TCPClient::handle_message()
+	{	
+		if (m_recv_buffer.empty())
 		{
-			std::string msg = m_send_buffer.retrieve_all_as_string();
-			m_send_buffer.clear();
+			return;
+		}
+		if (m_message_handler)
+		{
+			m_message_handler(shared_from_this());
+		}
+	}
 
-			asio::error_code ec;
-			m_tcp_socket.write_some(asio::buffer(msg), ec);
-			if (ec)
-			{
-				handle_error(ec);
-				return;
-			}
+	void TCPClient::send()
+	{
+		if (!m_tcp_socket.is_open())
+		{
+			return;
+		}
+
+		std::string msg = m_send_buffer.retrieve_all_as_string();
+		m_send_buffer.clear();
+
+		if (msg.size() > 0)
+		{
+			asio::write(m_tcp_socket, asio::buffer(msg));
 		}
 	}
 
@@ -67,33 +151,20 @@ namespace xsix
 	{
 		while (m_tcp_socket.is_open())
 		{
-			//TODO:echo test
-			auto ts = std::chrono::system_clock::now().time_since_epoch().count() / 10000;
-			std::string msg = "echo : " + std::to_string(ts);
-			send(msg.c_str(), msg.size());
-
 			tick();
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 		}
-		printf("tcp::client quit loop\n");
 	}
 
 	void TCPClient::tick()
 	{
-		if (m_tcp_socket.is_open())
+		if (!m_tcp_socket.is_open())
 		{
-			recv();
-			if (m_msg_processor)
-			{
-				m_msg_processor(m_recv_buffer);
-			}
-			else
-			{
-				default_msg_process(m_recv_buffer);
-			}
-			send_buffered_msg();
+			return;
 		}
+
+		recv();
+		handle_message();
+		send();
 	}
 
 	void TCPClient::handle_error(const asio::error_code& ec)
@@ -111,17 +182,8 @@ namespace xsix
 		else
 		{
 			printf("tcp client error : %s\n", ec.message().c_str());
-			m_tcp_socket.close();
 		}
-	}
 
-	void TCPClient::default_msg_process(xsix::buffer& msgbuffer)
-	{
-		std::string msg = msgbuffer.retrieve_all_as_string();
-		msgbuffer.clear();
-		if (msg.size() > 0)
-		{
-			printf("tcp client recv : %s\n", msg.c_str());
-		}
+		m_tcp_socket.close();
 	}
 }

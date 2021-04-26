@@ -21,7 +21,9 @@ namespace xsix
 	{
 	public:
 
-		using OnCloseHandler = std::function<void(TCPConnPtr pt)>;
+		using CloseHandler = std::function<void(TCPConnPtr ptr, const asio::error_code& ec)>;
+
+		using MessageHandler = std::function<void(TCPConnPtr ptr)>;
 
 	public:
 
@@ -31,9 +33,13 @@ namespace xsix
 
 		asio::ip::tcp::socket& socket() { return m_tcp_socket; }
 
-		const std::string ip() const { return m_tcp_socket.remote_endpoint().address().to_string(); }
+		const std::string local_ip() const { return m_tcp_socket.local_endpoint().address().to_string(); }
 
-		int32_t port() const { return (int32_t)m_tcp_socket.remote_endpoint().port(); }
+		int32_t local_port() const { return (int32_t)(m_tcp_socket.local_endpoint().port()); }
+
+		const std::string remote_ip() const { return m_tcp_socket.remote_endpoint().address().to_string(); }
+
+		int32_t remote_port() const { return (int32_t)(m_tcp_socket.remote_endpoint().port()); }
 
 		void    set_id(int32_t id) { m_id = id; }
 
@@ -41,15 +47,23 @@ namespace xsix
 
 	public:
 
-		void send(const char* msg, std::size_t msgsize);
+		void start();
 
 		void tick();
 
-		void set_on_close(OnCloseHandler onclose) { m_close_handler = onclose; }
+		void send(const char* msg, std::size_t msgsize) 
+		{
+			if (msg && m_tcp_socket.is_open())
+			{
+				m_send_buffer.append(msg, msgsize);
+			}
+		}
+
+		void set_close_handler(CloseHandler handler) { m_close_handler = handler; }
+
+		void set_message_handler(MessageHandler handler) { m_message_handler = handler; }
 
 	private:
-
-		void default_msg_process(xsix::buffer& msgbuffer);
 
 		void handle_disconnect();
 
@@ -57,19 +71,25 @@ namespace xsix
 
 	private:
 
+		void handle_message();
+
 		void async_recv();
 
 		void async_send();
+
+		void block_send();
+
+	public:
+
+		xsix::buffer		  m_recv_buffer;
+		xsix::buffer		  m_send_buffer;
 
 	private:
 
 		int32_t				  m_id = -1;
 		asio::ip::tcp::socket m_tcp_socket;
 
-		xsix::buffer		  m_recv_buffer;
-		xsix::buffer		  m_send_buffer;
-
-		OnCloseHandler		  m_close_handler;
-
+		CloseHandler		  m_close_handler;
+		MessageHandler		  m_message_handler;
 	};
 }

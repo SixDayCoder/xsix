@@ -30,8 +30,6 @@ set(ECHO_CLIENT_SRC_FILES ${PROJECT_SOURCE_DIR}/echo_client.cc)
 # generate exeutable
 add_executable(echo-server ${ECHO_SERVER_SRC_FILES})
 target_link_libraries(echo-server xsix ${CMAKE_THREAD_LIBS_INIT})
-# target_link_libraries(echo-server xsix)
 
 add_executable(echo-client ${ECHO_CLIENT_SRC_FILES})
 target_link_libraries(echo-client xsix ${CMAKE_THREAD_LIBS_INIT})
-# target_link_libraries(echo-client xsix)
