@@ -38,7 +38,8 @@ set(SRC_FILES
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_conn_manager.cc
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_client.cc
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_server.cc
+	${ROOT_PROJECT_DIR}/src/xsix/actor/actor_base.cc
 )
 
 # generate static library
-add_library(xsix STATIC ${SRC_FILES} "network/tcp_conn_manager.h" "network/tcp_client.h")
+add_library(xsix STATIC ${SRC_FILES})
