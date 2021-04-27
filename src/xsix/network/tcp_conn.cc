@@ -17,10 +17,12 @@ namespace xsix
 	void TCPConn::handle_disconnect()
 	{
 		auto self(shared_from_this());
+		set_state(STATE_DISCONNECTING);
 		if (m_close_handler)
 		{
 			m_close_handler(self, asio::error::connection_reset);
 		}
+		set_state(STATE_DISCONNECTED);
 		m_tcp_socket.close();
 	}
 

@@ -27,6 +27,17 @@ namespace xsix
 
 	public:
 
+		enum
+		{
+			STATE_INVALID = -1,       //初始状态
+			STATE_CONNECTING = 1,     //连接中
+			STATE_CONNECTED = 2,      //已连接
+			STATE_DISCONNECTING = 3,  //断开中
+			STATE_DISCONNECTED = 4,   //已断开
+		};
+
+	public:
+
 		TCPConn(asio::io_context& ctx) : m_tcp_socket(ctx) {}
 
 	public:
@@ -44,6 +55,10 @@ namespace xsix
 		void    set_id(int32_t id) { m_id = id; }
 
 		int32_t get_id() const { return m_id; }
+
+		void set_state(int32_t state) { m_state = state; }
+
+		int32_t get_state() const { return m_state; }
 
 	public:
 
@@ -87,6 +102,7 @@ namespace xsix
 	private:
 
 		int32_t				  m_id = -1;
+		int32_t				  m_state = STATE_INVALID;
 		asio::ip::tcp::socket m_tcp_socket;
 
 		CloseHandler		  m_close_handler;

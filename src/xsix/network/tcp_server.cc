@@ -20,6 +20,7 @@ namespace xsix
 		auto self(shared_from_this());
 
 		TCPConnPtr conn(new TCPConn(m_ctx));	
+		conn->set_state(TCPConn::STATE_CONNECTING);
 		conn->set_message_handler(m_conn_message_handler);
 		conn->set_close_handler([self](TCPConnPtr ptr, const asio::error_code& ec) {
 			if (!self || !ptr)
@@ -47,6 +48,7 @@ namespace xsix
 					{
 						self->m_accept_handler(self, conn, ec);
 					}
+					conn->set_state(TCPConn::STATE_CONNECTED);
 					conn->start();
 				}
 			}
