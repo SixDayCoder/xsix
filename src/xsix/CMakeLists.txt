@@ -39,6 +39,7 @@ set(SRC_FILES
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_client.cc
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_server.cc
 	${ROOT_PROJECT_DIR}/src/xsix/actor/actor_base.cc
+	${ROOT_PROJECT_DIR}/src/xsix/actor/actor_core.cc
 )
 
 # generate static library

@@ -1,5 +1,8 @@
-#include "actor_base.h"
 #include <cstdio>
+
+#include "actor_base.h"
+#include "xsix/time/timestamp.h"
+
 
 namespace xsix
 {
@@ -33,7 +36,12 @@ namespace xsix
 			}
 		}
 
-		printf("total msg count : %d, handle count : %d\n", msglist.size(), handle_count);
+		printf("actor id : %d, total msg count : %d, handle count : %d, timestamp : %lld\n",
+			get_id(),
+			msglist.size(),
+			handle_count,
+			Timestamp::now().unixmills()
+		);
 	}
 
 }

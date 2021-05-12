@@ -1,4 +1,4 @@
-#pragma 
+#pragma once
 
 #include "actor_message.h"
 #include <vector>
@@ -7,6 +7,8 @@
 
 namespace xsix
 {
+	class ActorCore;
+
 	class ActorBase;
 	using ActorBasePtr = std::shared_ptr<ActorBase>;
 
@@ -22,7 +24,11 @@ namespace xsix
 
 	public:
 
-		ActorBase(int32_t id = 0) : m_id(id), m_state(-1) {}
+		friend class ActorCore;
+
+	public:
+
+		ActorBase(int32_t id = 0) : m_id(id), m_state(STATE_READY_TICK) {}
 		virtual ~ActorBase() {}
 		
 	public:
@@ -45,6 +51,12 @@ namespace xsix
 
 		void handle_all_msg();
 
+	public:
+
+		int64_t get_last_tick_timestamp() const { return int64_t(m_last_tick_timestamp.load()); }
+
+		int64_t set_last_tick_timestamp(int64_t ts) { m_last_tick_timestamp.store(ts); }
+
 	private:
 
 		int32_t					 m_id = -1;
@@ -52,5 +64,7 @@ namespace xsix
 
 		std::mutex				 m_msg_vec_mutex;
 		std::vector<ActorMsgPtr> m_msg_vec;
+
+		std::atomic_int_fast64_t m_last_tick_timestamp;
 	};
 }

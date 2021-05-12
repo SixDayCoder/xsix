@@ -11,7 +11,7 @@ namespace xsix
 	void TCPConn::tick()
 	{
 		handle_message();
-		block_send();
+		async_send();
 	}
 
 	void TCPConn::handle_disconnect()
@@ -101,22 +101,6 @@ namespace xsix
 					}
 				}
 			);
-		}
-	}
-
-	void TCPConn::block_send()
-	{
-		if (!m_tcp_socket.is_open())
-		{
-			return;
-		}
-
-		std::string msg = m_send_buffer.retrieve_all_as_string();
-		m_send_buffer.clear();
-
-		if (msg.size() > 0)
-		{
-			asio::write(m_tcp_socket, asio::buffer(msg));
 		}
 	}
 }

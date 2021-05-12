@@ -92,8 +92,6 @@ namespace xsix
 
 		void async_send();
 
-		void block_send();
-
 	public:
 
 		xsix::buffer		  m_recv_buffer;
