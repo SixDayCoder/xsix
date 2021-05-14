@@ -1,6 +1,5 @@
 #include <cstdio>
-
-#include "xsix/actor/actor_base.h"
+#include <iostream>
 #include "xsix/actor/actor_core.h"
 
 class TestActor : public xsix::ActorBase
@@ -14,7 +13,8 @@ public:
 	virtual void tick() override
 	{
 		ActorBase::tick();
-		set_state(STATE_READY_TICK);
+		using namespace std;
+		cout << "i am test actor : " << get_id() << endl;
 	}
 };
 

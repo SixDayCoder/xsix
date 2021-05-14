@@ -37,7 +37,7 @@ int main()
 {
 	std::vector<std::thread> thread_vec;
 
-	for (int32_t i = 0; i < 1; ++i)
+	for (int32_t i = 0; i < 20; ++i)
 	{
 		asio::io_context ctx;
 		asio::ip::tcp::endpoint ep(asio::ip::address::from_string("127.0.0.1"), 8888);
@@ -55,8 +55,6 @@ int main()
 	{
 		th.join();
 	}
-
-	std::this_thread::sleep_for(std::chrono::seconds(999));
 
 	return 0;
 }

@@ -1,10 +1,11 @@
 #include "actor_core.h"
+#include "xsix/time/timestamp.h"
 #include <assert.h>
 
 namespace xsix
 {
 
-	bool _should_tick(ActorBasePtr ptr, int64_t ts)
+	static bool _should_tick(ActorBasePtr ptr, int64_t ts)
 	{
 		if (ptr->get_state() != ActorBase::STATE_READY_TICK)
 		{
@@ -34,23 +35,26 @@ namespace xsix
 	{
 		while (true)
 		{
-
-			auto now = std::chrono::system_clock::now();
-			auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(
-				now.time_since_epoch()
-			).count();
+			int64_t now = Timestamp::now().unixmills();
 			for (auto it = m_actor_map.begin(); it != m_actor_map.end(); ++it)
 			{
 				ActorBasePtr actor_ptr = it->second;
 				assert(actor_ptr);
-				if (_should_tick(actor_ptr, ts))
+				if (_should_tick(actor_ptr, now))
 				{
 					actor_ptr->set_state(ActorBase::STATE_TICKING);
-					actor_ptr->set_last_tick_timestamp(ts);
-					asio::post(m_thread_pool, std::bind(&ActorBase::tick, actor_ptr));
+					actor_ptr->set_last_tick_timestamp(now);
+					asio::post(m_thread_pool, 
+						[actor_ptr]() {
+							if (actor_ptr)
+							{
+								actor_ptr->tick();
+								actor_ptr->set_state(ActorBase::STATE_READY_TICK);
+							}
+						}
+					);
 				}
 			}
 		}
 	}
-
 }

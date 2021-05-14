@@ -5,6 +5,7 @@
 #include <atomic>
 #include <map>
 #include <chrono>
+#include <functional>
 
 #include "actor_base.h"
 #include "asio.hpp"
@@ -12,12 +13,11 @@
 
 namespace xsix
 {
-	class ActorCore
+	class ActorCore : public std::enable_shared_from_this<ActorCore>
 	{
 	public:
 
 		ActorCore() : m_thread_pool(std::thread::hardware_concurrency()) {}
-		~ActorCore() {}
 
 	public:
 
