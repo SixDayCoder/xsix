@@ -152,7 +152,7 @@ namespace xsix
 		return size;
 	}
 
-	int32_t buffer::write_to(char* dst, int32_t size)
+	int32_t buffer::write_to(void* dst, int32_t size)
 	{
 		if (!dst || size == 0)
 		{
@@ -183,47 +183,12 @@ namespace xsix
 			else
 			{
 				memcpy(dst, &m_data[m_head], right_free);
-				memcpy(&dst[right_free], m_data, size - right_free);
+				memcpy(((char*)dst + right_free), m_data, size - right_free);
 			}
 		}
 
 		m_head = (m_head + size) % (m_size - 1);
 		return size;
-	}
-
-	std::string buffer::get_debug_text()
-	{
-		if (!m_data)
-		{
-			return std::string("");
-		}
-
-		if (empty())
-		{
-			return std::string("");
-		}
-
-		char tmp[2048] = { 0 };
-		if (m_head <= m_tail)
-		{
-			memcpy(tmp, &m_data[m_head], length());
-			tmp[length()] = '\0';
-		}
-		else
-		{
-			int32_t right_free = m_size - m_head;
-			memcpy(tmp, &m_data[m_head], right_free);
-			memcpy(&tmp[right_free], &m_data[0], m_tail);
-			tmp[length()] = '\0';
-		}
-
-		char fmt[2048] = { 0 };
-		snprintf(fmt, 
-			2048,
-			"buffer::[head : %d, tail : %d, length : %d, size : %d, free_size : %d, data : \"%s\"]",
-			m_head, m_tail, length(), size(), get_free_size(), tmp
-		);
-		return std::string(fmt);
 	}
 
 	int32_t buffer::length() const
@@ -243,6 +208,60 @@ namespace xsix
 		}
 
 		return 0;
+	}
+
+	int32_t buffer::peek(void* dst, int32_t size)
+	{
+		if (!dst || size == 0)
+		{
+			return 0;
+		}
+
+		if (empty())
+		{
+			return 0;
+		}
+
+		if (length() < size)
+		{
+			size = length();
+		}
+
+		if (m_head < m_tail)
+		{
+			memcpy(dst, &m_data[m_head], size);
+		}
+		else
+		{
+			int32_t right_free = m_size - m_head;
+			if (size <= right_free)
+			{
+				memcpy(dst, &m_data[m_head], size);
+			}
+			else
+			{
+				memcpy(dst, &m_data[m_head], right_free);
+				memcpy(((char*)dst + right_free), m_data, size - right_free);
+			}
+		}
+
+		return size;
+	}
+
+	bool buffer::skip(int32_t size)
+	{
+		if (size <= 0)
+		{
+			return false;
+		}
+
+		if (length() < size)
+		{
+			return false;
+		}
+
+		m_head = (m_head + size) % (m_size - 1);
+		return true;
 	}
 
 	void buffer::init()
@@ -317,5 +336,40 @@ namespace xsix
 			m_size = size;
 			memcpy(&m_data[0], src, len);
 		}
+	}
+
+	std::string buffer::get_debug_text()
+	{
+		if (!m_data)
+		{
+			return std::string("");
+		}
+
+		if (empty())
+		{
+			return std::string("");
+		}
+
+		char tmp[2048] = { 0 };
+		if (m_head <= m_tail)
+		{
+			memcpy(tmp, &m_data[m_head], length());
+			tmp[length()] = '\0';
+		}
+		else
+		{
+			int32_t right_free = m_size - m_head;
+			memcpy(tmp, &m_data[m_head], right_free);
+			memcpy(&tmp[right_free], &m_data[0], m_tail);
+			tmp[length()] = '\0';
+		}
+
+		char fmt[2048] = { 0 };
+		snprintf(fmt,
+			2048,
+			"buffer::[head : %d, tail : %d, length : %d, size : %d, free_size : %d, data : \"%s\"]",
+			m_head, m_tail, length(), size(), get_free_size(), tmp
+		);
+		return std::string(fmt);
 	}
 }

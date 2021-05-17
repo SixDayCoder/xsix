@@ -36,12 +36,12 @@ namespace xsix
 			}
 		}
 
-		printf("actor id : %d, total msg count : %d, handle count : %d, timestamp : %lld\n",
-			get_id(),
-			msglist.size(),
-			handle_count,
-			Timestamp::now().unixmills()
-		);
+		//printf("actor id : %d, total msg count : %d, handle count : %d, timestamp : %lld\n",
+		//	get_id(),
+		//	msglist.size(),
+		//	handle_count,
+		//	Timestamp::now().unixmills()
+		//);
 	}
 
 }

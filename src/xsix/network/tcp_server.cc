@@ -65,6 +65,11 @@ namespace xsix
 
 	void TCPServer::tick()
 	{
+		if (!m_tcp_acceptor.is_open())
+		{
+			return;
+		}
+
 		//poll for async_accept/conntions async_recv/async_send
 		auto executed_events = m_ctx.poll();
 

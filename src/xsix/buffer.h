@@ -37,17 +37,25 @@ namespace xsix
 
 		std::string retrieve_all_as_string();
 
+		const int32_t headpos() const { return m_head; }
+
+		const int32_t tailpos() const { return m_tail; }
+
 	public:
 		
 		int32_t	append(const char* src, int32_t size);
 
-		int32_t	write_to(char* dst, int32_t size);
+		int32_t	write_to(void* dst, int32_t size);
 
 		int32_t	length()  const;
 
 		int32_t	size() const { return m_size; }
 
 		int32_t	get_free_size() const { return m_size - length(); }
+
+		int32_t peek(void* dst, int32_t size);
+
+		bool	skip(int32_t size);
 
 	private:
 

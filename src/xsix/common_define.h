@@ -19,6 +19,10 @@
 	#pragma warning(disable:4996)
 #endif
 
+#if defined _XSIX_LINUX
+#include<netinet/in.h>
+#endif
+
 namespace xsix
 {
 	#define XASSERT(expression) assert(expression)
