@@ -21,7 +21,7 @@ include_directories(${THIRD_ASIO_DIR}/include)
 
 # add link dirs
 link_directories(/usr/local/lib)
-link_directories(${ROOT_PROJECT_DIR}/lib)
+link_directories(${ROOT_PROJECT_DIR}/bin)
 
 # find src files
 set(ECHO_SERVER_SRC_FILES ${PROJECT_SOURCE_DIR}/echo_server.cc)

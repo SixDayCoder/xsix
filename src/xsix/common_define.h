@@ -7,6 +7,8 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include <atomic>
+#include <map>
 
 //platform define
 #if ( defined(_WIN32) || defined(_WIN64) )
@@ -16,7 +18,8 @@
 #endif
 
 #if defined _XSIX_WINDOWS
-	#pragma warning(disable:4996)
+#pragma warning(disable:4996)
+#include <winsock2.h>
 #endif
 
 #if defined _XSIX_LINUX

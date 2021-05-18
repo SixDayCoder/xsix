@@ -14,6 +14,14 @@ namespace xsix
 		async_send();
 	}
 
+	void TCPConn::send(const char* msg, int32_t msgsize)
+	{
+		if (msg && m_tcp_socket.is_open())
+		{
+			m_send_buffer.append(msg, msgsize);
+		}
+	}
+
 	void TCPConn::handle_disconnect()
 	{
 		auto self(shared_from_this());

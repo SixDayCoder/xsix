@@ -7,9 +7,6 @@
 
 #include "asio.hpp"
 
-#include <memory>
-#include <functional>
-
 namespace xsix
 {
 	class TCPConn;
@@ -66,13 +63,7 @@ namespace xsix
 
 		void tick();
 
-		void send(const char* msg, std::size_t msgsize) 
-		{
-			if (msg && m_tcp_socket.is_open())
-			{
-				m_send_buffer.append(msg, msgsize);
-			}
-		}
+		void send(const char* msg, int32_t msgsize);
 
 		void set_close_handler(CloseHandler handler) { m_close_handler = handler; }
 

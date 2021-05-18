@@ -21,7 +21,7 @@ include_directories(${THIRD_ASIO_DIR}/include)
 
 # add link dirs
 link_directories(/usr/local/lib)
-link_directories(${ROOT_PROJECT_DIR}/lib)
+link_directories(${ROOT_PROJECT_DIR}/bin)
 
 # find src files
 set(CHAT_ROOM_CLIENT_SRC_FILTES

@@ -1,13 +1,6 @@
 #pragma once
 
-#include "xsix/common_define.h"
-#include "xsix/noncopyable.h"
-#include "xsix/time/timestamp.h"
-
 #include "tcp_conn.h"
-
-#include <memory>
-#include <map>
 
 namespace xsix
 {

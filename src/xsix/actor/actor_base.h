@@ -55,7 +55,7 @@ namespace xsix
 
 		int64_t get_last_tick_timestamp() const { return int64_t(m_last_tick_timestamp.load()); }
 
-		int64_t set_last_tick_timestamp(int64_t ts) { m_last_tick_timestamp.store(ts); }
+		void	set_last_tick_timestamp(int64_t ts) { m_last_tick_timestamp.store(ts); }
 
 	private:
 

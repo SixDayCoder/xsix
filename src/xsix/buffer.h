@@ -8,9 +8,9 @@ namespace xsix
 	{
 	public:
 
-		enum 
+		enum
 		{
-			BUFFER_SIZE_SMALL = 64,	
+			BUFFER_SIZE_SMALL = 64,
 			BUFFER_SIZE_RAW   = 1024,								//1KB
 			BUFFER_SIZE_MAX   = BUFFER_SIZE_RAW * BUFFER_SIZE_RAW,  //1MB
 		};
@@ -29,23 +29,13 @@ namespace xsix
 
 	public:
 
-		const char* buf() { neaten();  return m_data; }
+		bool		  empty() const { return m_head == m_tail; }
 
-		bool		empty() const { return m_head == m_tail; }
+		void		  clear();
 
-		void		clear();
-
-		std::string retrieve_all_as_string();
-
-		const int32_t headpos() const { return m_head; }
-
-		const int32_t tailpos() const { return m_tail; }
+		std::string   retrieve_all_as_string();
 
 	public:
-		
-		int32_t	append(const char* src, int32_t size);
-
-		int32_t	write_to(void* dst, int32_t size);
 
 		int32_t	length()  const;
 
@@ -53,13 +43,21 @@ namespace xsix
 
 		int32_t	get_free_size() const { return m_size - length(); }
 
+		const int32_t headpos() const { return m_head; }
+
+		const int32_t tailpos() const { return m_tail; }
+
+	public:
+
+		int32_t	append(const char* src, int32_t size);
+
+		int32_t	write_to(void* dst, int32_t size);
+
 		int32_t peek(void* dst, int32_t size);
 
 		bool	skip(int32_t size);
 
 	private:
-
-		void init();
 
 		void cleanup();
 
@@ -72,11 +70,8 @@ namespace xsix
 	private:
 
 		char*	 m_data;
-
-		int32_t  m_size;
-
-		int32_t  m_head;
-
-		int32_t  m_tail;
+		int32_t  m_size = 0;
+		int32_t  m_head = 0;
+		int32_t  m_tail = 0;
 	};
 }

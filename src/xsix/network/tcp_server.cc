@@ -1,5 +1,4 @@
 #include "tcp_server.h"
-#include <stdio.h>
 
 namespace xsix
 {

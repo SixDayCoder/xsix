@@ -41,6 +41,7 @@ message("======executable output path====== : " = ${EXECUTABLE_OUTPUT_PATH})
 # set lib dir
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 message("======lib output path====== : " = ${LIBRARY_OUTPUT_PATH})
+message("======project bindary dir ===== : " = ${PROJECT_BINARY_DIR})
 
 # add include dirs
 include_directories(${PROJECT_SOURCE_DIR})
@@ -63,3 +64,4 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src/xsix)
 add_subdirectory(${PROJECT_SOURCE_DIR}/examples/echo)
 add_subdirectory(${PROJECT_SOURCE_DIR}/examples/actor)
 add_subdirectory(${PROJECT_SOURCE_DIR}/examples/chatroom)
+add_subdirectory(${PROJECT_SOURCE_DIR}/test/buffer)

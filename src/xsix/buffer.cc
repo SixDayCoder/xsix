@@ -35,17 +35,17 @@ namespace xsix
 		return (size > 0 && size <= buffer::BUFFER_SIZE_MAX);
 	}
 
-	buffer::buffer(int32_t init_size /*= BUFFER_SIZE_SMALL*/)
+	buffer::buffer(int32_t init_size /*= BUFFER_SIZE_SMALL*/) : m_data(nullptr)
 	{
-		init();
+		cleanup();
 		init_size = init_size > BUFFER_SIZE_SMALL ? init_size : BUFFER_SIZE_SMALL;
 		init_size = init_size > BUFFER_SIZE_MAX ? BUFFER_SIZE_MAX : init_size;
 		XASSERT(resize(init_size));
 	}
 
-	buffer::buffer(const std::string& s)
+	buffer::buffer(const std::string& s) : m_data(nullptr)
 	{
-		init();
+		cleanup();
 		copy_from(s.c_str(), s.length(), s.length() + s.length() / 2);
 	}
 
@@ -98,7 +98,7 @@ namespace xsix
 	{
 		XASSERT(src);
 
-		if (src <= 0)
+		if (size <= 0)
 		{
 			return 0;
 		}
@@ -264,23 +264,14 @@ namespace xsix
 		return true;
 	}
 
-	void buffer::init()
-	{
-		m_data = nullptr;
-
-		m_size = m_head = m_tail = 0;
-	}
-
 	void buffer::cleanup()
 	{
 		if (m_data)
 		{
 			XFREE(m_data);
-
-			m_data = nullptr;
-
-			m_size = m_head = m_tail = 0;
 		}
+		m_data = nullptr;
+		m_size = m_head = m_tail = 0;
 	}
 
 	bool buffer::resize(int32_t newsize)
@@ -350,7 +341,7 @@ namespace xsix
 			return std::string("");
 		}
 
-		char tmp[2048] = { 0 };
+		char tmp[BUFFER_SIZE_MAX] = { 0 };
 		if (m_head <= m_tail)
 		{
 			memcpy(tmp, &m_data[m_head], length());
@@ -364,10 +355,10 @@ namespace xsix
 			tmp[length()] = '\0';
 		}
 
-		char fmt[2048] = { 0 };
+		char fmt[BUFFER_SIZE_MAX + 256] = { 0 };
 		snprintf(fmt,
-			2048,
-			"buffer::[head : %d, tail : %d, length : %d, size : %d, free_size : %d, data : \"%s\"]",
+			BUFFER_SIZE_MAX + 256,
+			"buffer::[head(%d) tail(%d) length(%d) size(%d) free_size(%d) data(\"%s\")]",
 			m_head, m_tail, length(), size(), get_free_size(), tmp
 		);
 		return std::string(fmt);
