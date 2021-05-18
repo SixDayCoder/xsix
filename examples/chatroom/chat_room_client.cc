@@ -5,21 +5,40 @@
 #include <iostream>
 #include <functional>
 #include <chrono>
+#include <random>
+#include <atomic>
 using namespace std;
 
+std::thread generate_msg_thread;
+std::atomic_bool stop_random(false);
 
-std::thread loop_thread;
-std::thread input_thread;
-
-void fetch_input(xsix::TCPClientPtr client)
+std::string random_str()
 {
-	std::string s;
-	while (true)
-	{
-		s.clear();
-		cout << "input msg : >";
-		cin >> s;
+	std::string str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
+	std::random_device rdv;	
+	static std::default_random_engine e{ rdv() };
+	static std::uniform_int_distribution<uint32_t> u1(20, 80);
+	static std::uniform_int_distribution<uint32_t> u2(0, str.length());
+
+	auto cnt = u1(e);
+	std::string result;
+	for (int32_t i = 0; i < cnt; ++i)
+	{
+		int32_t index = u2(e);
+		result.push_back(str[index]);
+	}
+	return result;
+}
+
+void generate_msg(xsix::TCPClientPtr client)
+{
+	std::default_random_engine e;
+	std::uniform_int_distribution<uint32_t> u(1, 3);
+	while (!stop_random.load())
+	{
+		std::string s = random_str();
+		
 		chat_room_msg msg;
 		msg.set_content(s.c_str(), s.length());
 
@@ -28,6 +47,7 @@ void fetch_input(xsix::TCPClientPtr client)
 		msg.write_to_buf(sendbuf, &bytes);
 
 		client->send(sendbuf, bytes);
+		std::this_thread::sleep_for(std::chrono::seconds(u(e)));
 	}
 }
 
@@ -38,7 +58,7 @@ void connected(xsix::TCPClientPtr ptr)
 		return;
 	}
 	cout << "connected ready input!" << endl;
-	input_thread = std::thread(std::bind(fetch_input, ptr));
+	generate_msg_thread = std::thread(std::bind(generate_msg, ptr));
 }
 
 void chat(xsix::TCPClientPtr conn)
@@ -52,20 +72,6 @@ void chat(xsix::TCPClientPtr conn)
 	{
 		return;
 	}
-
-	//chat_room_msg msg;
-	//conn->m_recv_buffer.peek(&msg.header, sizeof(chat_room_msg_header));
-
-	//uint16_t content_length = 0;
-	//memcpy(&content_length, &msg.header, sizeof(uint16_t));
-	//content_length = ntohs(content_length);
-
-	//if (conn->m_recv_buffer.length() >= content_length &&
-	//	conn->m_recv_buffer.skip(sizeof(chat_room_msg_header)))
-	//{
-	//	conn->m_recv_buffer.write_to(msg.content, content_length);
-	//	printf("%s\n", msg.content);
-	//}
 
 	//parse message
 	std::string s = conn->m_recv_buffer.retrieve_all_as_string();
@@ -86,6 +92,15 @@ void chat(xsix::TCPClientPtr conn)
 	}
 }
 
+void close_handler(xsix::TCPClientPtr client)
+{
+	if (!client)
+	{
+		return;
+	}
+	stop_random.store(true);
+}
+
 int main()
 {
 	asio::io_context ctx;
@@ -94,11 +109,11 @@ int main()
 
 	client->set_connected_handler(connected);
 	client->set_message_handler(chat);
+	client->set_close_handler(close_handler);
 	client->connect(ep);
-
-	loop_thread = std::thread(std::bind(&xsix::TCPClient::loop, client));
-	loop_thread.join();
-	input_thread.join();
+	client->loop();
+	generate_msg_thread.join();
+	printf("finished!\n");
 	
 	return 0;
 }

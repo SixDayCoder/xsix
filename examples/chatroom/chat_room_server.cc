@@ -115,7 +115,7 @@ public:
 	{
 		xsix::ActorBase::tick();
 		m_tcp_server->tick();
-		m_tcp_server->get_conn_mgr().print_conn_state();
+		//m_tcp_server->get_conn_mgr().print_conn_state();
 	}
 
 private:

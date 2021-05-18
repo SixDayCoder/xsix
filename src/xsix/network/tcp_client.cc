@@ -183,7 +183,10 @@ namespace xsix
 		{
 			printf("tcp client error : %s\n", ec.message().c_str());
 		}
-
 		m_tcp_socket.close();
+		if (m_close_handler)
+		{
+			m_close_handler(shared_from_this());
+		}
 	}
 }
