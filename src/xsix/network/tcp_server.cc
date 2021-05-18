@@ -50,6 +50,9 @@ namespace xsix
 					}
 					conn->set_state(TCPConn::STATE_CONNECTED);
 					conn->start();
+
+					//fire another accept event
+					self->accept();
 				}
 			}
 		);

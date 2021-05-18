@@ -59,9 +59,6 @@ private:
 		}
 
 		cout << "welcome conn join : " << conn->get_id() << endl;
-
-		//fire another accpet events
-		server->accept();
 	}
 
 	void message_handler(xsix::TCPConnPtr conn)

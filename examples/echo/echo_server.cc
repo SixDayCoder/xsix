@@ -44,9 +44,6 @@ void accept_handler(xsix::TCPServerPtr server, xsix::TCPConnPtr conn, const asio
 		conn->remote_ip().c_str(),
 		conn->remote_port()
 	);
-
-	//fire another accpet events
-	server->accept();
 }
 
 int main()
