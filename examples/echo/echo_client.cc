@@ -14,7 +14,7 @@ void connected(xsix::TCPClientPtr ptr)
 	}
 	std::string msg = "sixday";
 	printf("connected! ready send msg : %s, size : %d\n", msg.c_str(), msg.size());
-	ptr->send(msg.c_str(), msg.size());
+	ptr->send(msg);
 }
 
 void echo(xsix::TCPClientPtr conn)
@@ -24,31 +24,34 @@ void echo(xsix::TCPClientPtr conn)
 		return;
 	}
 
-	std::string msg = conn->m_recv_buffer.retrieve_all_as_string();
-	conn->m_recv_buffer.clear();
-	if (msg.size() > 0)
+	if (conn->m_recv_buffer.empty())
 	{
-		printf("tcp client recv : %s\n", msg.c_str());
-		conn->send(msg.c_str(), msg.size());
+		return;
+	}
+
+	char buf[4096] = { 0 };
+	int32_t size = conn->m_recv_buffer.write_to(buf, 4096);
+	if (size > 0)
+	{
+		printf("tcp client recv : %s\n", buf);
+		conn->send(buf, size);
 	}
 }
 
 int main()
 {
+	asio::ip::tcp::endpoint ep(asio::ip::address::from_string("127.0.0.1"), 8888);
 	std::vector<std::thread> thread_vec;
 
 	for (int32_t i = 0; i < 20; ++i)
 	{
-		asio::io_context ctx;
-		asio::ip::tcp::endpoint ep(asio::ip::address::from_string("127.0.0.1"), 8888);
-		xsix::TCPClientPtr client(new xsix::TCPClient(ctx));
-
+		xsix::TCPClientPtr client(new xsix::TCPClient());
 		client->set_connected_handler(connected);
 		client->set_message_handler(echo);
-		client->connect(ep);
+		client->async_connect(ep);
 
 		std::thread th(std::bind(&xsix::TCPClient::loop, client));
-		thread_vec.emplace_back(std::move(th));
+		thread_vec.emplace_back(std::move(th));		
 	}
 
 	for (auto& th : thread_vec)

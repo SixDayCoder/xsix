@@ -40,6 +40,17 @@ public:
 
 private:
 
+	chat_room_msg get_sendback_msg(int32_t id, const chat_room_msg& msg)
+	{
+		char buf[2048] = { 0 };
+		snprintf(buf, 2048, "guest:%d say:%s", id, msg.content);
+
+		chat_room_msg sendmsg;
+		sendmsg.set_content(buf, strlen(buf));
+
+		return sendmsg;
+	}
+
 	void broad_cast(const chat_room_msg& msg)
 	{
 		cout << msg.content << endl;
@@ -73,35 +84,29 @@ private:
 			return;
 		}
 
-		//parse message
-		std::string s = conn->m_recv_buffer.retrieve_all_as_string();
-		conn->m_recv_buffer.clear();
-
+		int32_t peeksize = 0;
 		chat_room_msg msg;
-		memcpy(&msg.header, s.c_str(), sizeof(chat_room_msg_header));
-
-		uint16_t content_length = 0;
-		memcpy(&content_length, &msg.header, sizeof(uint16_t));
-		content_length = ntohs(content_length);
-		msg.header.size = content_length;
-
-		if (s.length() >= content_length + sizeof(chat_room_msg_header))
+		while (!conn->m_recv_buffer.empty())
 		{
-			memcpy(msg.content, s.c_str() + sizeof(chat_room_msg_header), content_length);
+			msg.clear();
+
+			peeksize = conn->m_recv_buffer.peek(&msg.header, sizeof(chat_room_msg_header));
+			if (peeksize != sizeof(chat_room_msg_header))
+			{
+				break;
+			}
+
+			msg.header.contentsize = ntohs(msg.header.contentsize);
+			if (msg.header.contentsize <= 0 || conn->m_recv_buffer.length() < msg.header.contentsize)
+			{
+				break;
+			}
+
+			conn->m_recv_buffer.skip(sizeof(chat_room_msg_header));
+			conn->m_recv_buffer.write_to(msg.content, msg.header.contentsize);
 			chat_room_msg sendbackmsg = get_sendback_msg(conn->get_id(), msg);
 			broad_cast(sendbackmsg);
 		}
-	}
-
-	chat_room_msg get_sendback_msg(int32_t id, const chat_room_msg& msg)
-	{
-		char buf[2048] = { 0 };
-		snprintf(buf, 2048, "guest:%d say:%s", id, msg.content);
-
-		chat_room_msg sendmsg;
-		sendmsg.set_content(buf, strlen(buf));
-
-		return sendmsg;
 	}
 
 public:

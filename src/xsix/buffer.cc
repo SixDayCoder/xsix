@@ -54,47 +54,41 @@ namespace xsix
 		cleanup();
 	}
 
-	void buffer::neaten()
-	{
-		if (empty())
-		{
-			return;
-		}
-
-		char* new_data = (char*)XMALLOC(m_size);
-		XASSERT(new_data);
-
-		if (m_head < m_tail)
-		{
-			memcpy(new_data, &m_data[m_head], m_tail - m_head);
-		}
-		else if (m_head > m_tail)
-		{
-			memcpy(new_data, &m_data[m_head], m_size - m_head);
-			memcpy(&new_data[m_size - m_head], m_data, m_tail);
-		}
-
-		XFREE(m_data);
-		m_data = new_data;
-		m_head = 0;
-		m_tail = length();
-		m_size = m_size;
-	}
-
 	void buffer::clear()
 	{
 		m_tail = m_head = 0;
+		m_full = false;
 	}
 
 	std::string buffer::retrieve_all_as_string()
 	{
-		neaten();
-		std::string s;	
-		s.assign(m_data, length());
-		return s;
+		if (empty())
+		{
+			return std::string("");
+		}
+
+		char tmp[4096] = { 0 };
+		if (m_head < m_tail)
+		{
+			memcpy(tmp, &m_data[m_head], length());
+		}
+		else
+		{
+			int32_t right_free = m_size - m_head;
+			memcpy(tmp, &m_data[m_head], right_free);
+			memcpy(&tmp[right_free], m_data, m_tail);
+		}
+		tmp[length()] = '\0';
+
+		return std::string(tmp);
 	}
 
-	int32_t buffer::append(const char* src, int32_t size)
+	int32_t buffer::append(const std::string& s)
+	{
+		return append(s.c_str(), (int32_t)s.length());
+	}
+
+	int32_t buffer::append(const void* src, int32_t size)
 	{
 		XASSERT(src);
 
@@ -117,26 +111,21 @@ namespace xsix
 			// |---------------------|---------------------------|
 			// 0(head)				 tail                        size
 			// <-------good----------><------------free------------>
-			if (m_head == 0)
+
+			// condition(2)
+			// |-----------|-----------|---------------------------|
+			// 0           head		   tail                        size
+			// <--no data--><-- good----><------------free--------->
+
+			int32_t right_free = m_size - m_tail;
+			if (size <= right_free)
 			{
 				memcpy(&m_data[m_tail], src, size);
 			}
 			else
 			{
-				// condition(2)
-				// |-----------|-----------|---------------------------|
-				// 0           head		   tail                        size
-				// <--no data--><-- good----><------------free--------->
-				int32_t right_free = m_size - m_tail;
-				if (size <= right_free)
-				{
-					memcpy(&m_data[m_tail], src, size);
-				}
-				else
-				{
-					memcpy(&m_data[m_tail], src, right_free);
-					memcpy(m_data, &src[right_free], size - right_free);
-				}
+				memcpy(&m_data[m_tail], src, right_free);
+				memcpy(m_data, (char*)src + right_free, size - right_free);
 			}
 		}
 		else
@@ -147,8 +136,9 @@ namespace xsix
 			// <---good---><---free---><-------------good---------->
 			memcpy(&m_data[m_tail], src, size);
 		}
-
+		int32_t oldtail = m_tail;
 		m_tail = (m_tail + size) % m_size;
+		check_full_after_append(oldtail, m_tail);
 		return size;
 	}
 
@@ -183,11 +173,13 @@ namespace xsix
 			else
 			{
 				memcpy(dst, &m_data[m_head], right_free);
-				memcpy(((char*)dst + right_free), m_data, size - right_free);
+				memcpy((char*)dst + right_free, m_data, size - right_free);
 			}
 		}
 
-		m_head = (m_head + size) % (m_size - 1);
+		int32_t oldhead = m_head;
+		m_head = (m_head + size) % m_size;
+		check_full_after_writeto(oldhead, m_head);
 		return size;
 	}
 
@@ -196,6 +188,11 @@ namespace xsix
 		if (empty())
 		{
 			return 0;
+		}
+
+		if (full())
+		{
+			return m_size;
 		}
 
 		if (m_head < m_tail)
@@ -241,7 +238,7 @@ namespace xsix
 			else
 			{
 				memcpy(dst, &m_data[m_head], right_free);
-				memcpy(((char*)dst + right_free), m_data, size - right_free);
+				memcpy((char*)dst + right_free, m_data, size - right_free);
 			}
 		}
 
@@ -260,7 +257,9 @@ namespace xsix
 			return false;
 		}
 
-		m_head = (m_head + size) % (m_size - 1);
+		int32_t oldhead = m_head;
+		m_head = (m_head + size) % m_size;
+		check_full_after_writeto(oldhead, m_head);
 		return true;
 	}
 
@@ -272,6 +271,39 @@ namespace xsix
 		}
 		m_data = nullptr;
 		m_size = m_head = m_tail = 0;
+		m_full = false;
+	}
+
+	void buffer::realloc(int32_t newsize)
+	{
+		if (newsize <= 0)
+		{
+			return;
+		}
+
+		char* new_data = (char*)XMALLOC(newsize);
+		XASSERT(new_data);
+
+		if (m_data != nullptr)
+		{
+			if (m_head < m_tail)
+			{
+				memcpy(new_data, &m_data[m_head], m_tail - m_head);
+			}
+			else
+			{
+				int32_t right_free = m_size - m_head;
+				memcpy(new_data, &m_data[m_head], right_free);
+				memcpy(&new_data[right_free], m_data, m_tail);
+			}
+			XFREE(m_data);
+		}
+
+		m_data = new_data;
+		m_head = 0;
+		m_tail = length();
+		m_size = newsize;
+		m_full = m_tail == m_size ? true : false;
 	}
 
 	bool buffer::resize(int32_t newsize)
@@ -292,23 +324,7 @@ namespace xsix
 			return false;
 		}
 
-		char* new_data = (char*)XMALLOC(newsize);
-		XASSERT(new_data);
-		if (m_head <= m_tail)
-		{
-			memcpy(new_data, &m_data[m_head], m_tail - m_head);
-		}
-		else if (m_head > m_tail)
-		{
-			memcpy(new_data, &m_data[m_head], m_size - m_head);
-			memcpy(&new_data[m_size - m_head], m_data, m_tail);
-		}
-
-		XFREE(m_data);
-		m_data = new_data;
-		m_head = 0;
-		m_tail = length();
-		m_size = newsize;
+		realloc(newsize);
 		return true;
 	}
 
@@ -329,6 +345,20 @@ namespace xsix
 		}
 	}
 
+	void buffer::check_full_after_append(int32_t oldtail, int32_t newtail)
+	{
+		m_full = false;
+		if (m_head == newtail)
+		{
+			m_full = true;
+		}
+	}
+
+	void buffer::check_full_after_writeto(int32_t oldhead, int32_t newhead)
+	{
+		m_full = false;
+	}
+
 	std::string buffer::get_debug_text()
 	{
 		if (!m_data)
@@ -341,25 +371,12 @@ namespace xsix
 			return std::string("");
 		}
 
-		char tmp[BUFFER_SIZE_MAX] = { 0 };
-		if (m_head <= m_tail)
-		{
-			memcpy(tmp, &m_data[m_head], length());
-			tmp[length()] = '\0';
-		}
-		else
-		{
-			int32_t right_free = m_size - m_head;
-			memcpy(tmp, &m_data[m_head], right_free);
-			memcpy(&tmp[right_free], &m_data[0], m_tail);
-			tmp[length()] = '\0';
-		}
-
-		char fmt[BUFFER_SIZE_MAX + 256] = { 0 };
+		std::string s = retrieve_all_as_string();
+		char fmt[4096 + 256] = { 0 };
 		snprintf(fmt,
-			BUFFER_SIZE_MAX + 256,
+			4096 + 256,
 			"buffer::[head(%d) tail(%d) length(%d) size(%d) free_size(%d) data(\"%s\")]",
-			m_head, m_tail, length(), size(), get_free_size(), tmp
+			m_head, m_tail, length(), size(), get_free_size(), s.c_str()
 		);
 		return std::string(fmt);
 	}

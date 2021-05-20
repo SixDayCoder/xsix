@@ -74,6 +74,7 @@ namespace xsix
 
 		//poll for async_accept/conntions async_recv/async_send
 		auto executed_events = m_ctx.poll();
+		//auto executed_events = m_ctx.run_for(std::chrono::milliseconds(1));
 
 		//connection tick 
 		for (auto it = m_tcp_conn_mgr.m_tcp_conn_map.begin(); 

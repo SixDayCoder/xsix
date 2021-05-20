@@ -5,12 +5,6 @@
 #include "xsix/time/timestamp.h"
 #include "xsix/buffer.h"
 
-#include <atomic>
-#include <memory>
-#include <map>
-#include <functional>
-#include <stdio.h>
-
 #include "asio.hpp"
 
 namespace xsix
@@ -24,14 +18,12 @@ namespace xsix
 	public:
 
 		using CloseHandler = std::function<void(TCPClientPtr ptr)>;
-
 		using MessageHandler = std::function<void(TCPClientPtr ptr)>;
-
 		using ConnectedHandler = std::function<void(TCPClientPtr ptr)>;
 
 	public:
 
-		TCPClient(asio::io_context& ctx);
+		TCPClient();
 
 	public:
 
@@ -53,31 +45,27 @@ namespace xsix
 
 	public:
 
-		void connect(asio::ip::tcp::endpoint ep);
-
 		void async_connect(asio::ip::tcp::endpoint ep);
 
 		void send(const char* msg, std::size_t msgsize);
+
+		void send(const std::string& s);
 
 		void loop();
 
 		void tick();
 
-	private:
-
-		void recv();
-
-		void handle_message();
-
-		void send();
+		asio::io_context& get_context() { return m_ctx; }
 
 	private:
+
+		void start();
 
 		void async_recv();
 
 		void async_send();
 
-	private:
+		void handle_message();
 
 		void handle_error(const asio::error_code& ec);
 
@@ -88,7 +76,7 @@ namespace xsix
 
 	private:
 
-		asio::io_context&	    m_ctx;
+		asio::io_context	    m_ctx;
 		asio::ip::tcp::socket   m_tcp_socket;
 
 		CloseHandler		  m_close_handler;

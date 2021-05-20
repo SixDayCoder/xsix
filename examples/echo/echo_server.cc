@@ -17,12 +17,12 @@ void conn_echo(xsix::TCPConnPtr conn)
 		return;
 	}
 
-	std::string msg = conn->m_recv_buffer.retrieve_all_as_string();
-	conn->m_recv_buffer.clear();
-	if (msg.size() > 0)
+	char buf[4096] = { 0 };
+	int32_t size = conn->m_recv_buffer.write_to(buf, 4096);
+	if (size > 0)
 	{
-		printf("tcp conn id : %d, recv : %s\n", conn->get_id(), msg.c_str());
-		conn->send(msg.c_str(), msg.size());
+		printf("tcp conn id : %d, recv : %s\n", conn->get_id(), buf);
+		conn->send(buf, size);
 	}
 }
 

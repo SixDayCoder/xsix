@@ -1,4 +1,5 @@
 #include "tcp_conn.h"
+#include <iostream>
 
 namespace xsix
 {
@@ -72,6 +73,7 @@ namespace xsix
 					handle_error(ec);
 					return;
 				}
+
 				m_recv_buffer.append(buf, bytes);
 
 				//fire another event
@@ -95,12 +97,16 @@ namespace xsix
 			return;
 		}
 
-		std::string msg = m_send_buffer.retrieve_all_as_string();
-		m_send_buffer.clear();
-
-		if (msg.size() > 0)
+		if (m_send_buffer.empty())
 		{
-			asio::async_write(m_tcp_socket, asio::buffer(msg),
+			return;
+		}
+
+		char buf[4096] = { 0 };
+		int32_t writesize = m_send_buffer.write_to(buf, 4096);
+		if (writesize > 0)
+		{
+			asio::async_write(m_tcp_socket, asio::buffer(buf, writesize),
 				[&](const asio::error_code& ec, std::size_t bytes) {
 					if (ec)
 					{
