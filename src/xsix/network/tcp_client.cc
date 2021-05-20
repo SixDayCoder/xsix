@@ -60,8 +60,7 @@ namespace xsix
 		{
 			return;
 		}
-		auto executed_events = m_ctx.run_for(std::chrono::milliseconds(1));
-		//auto executed_events = m_ctx.poll();
+		auto executed_events = m_ctx.poll();
 		handle_message();
 		async_send();
 	}

@@ -21,6 +21,8 @@ namespace xsix
 
 		TCPConnPtr  find_conn(int32_t connid);
 
+		int32_t		get_conn_count() const { return m_tcp_conn_map.size(); }
+
 	public:
 
 		void broadcast(const char* msg, int32_t size);
