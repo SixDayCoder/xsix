@@ -40,28 +40,6 @@ public:
 
 private:
 
-	chat_room_msg get_sendback_msg(int32_t id, const chat_room_msg& msg)
-	{
-		char buf[2048] = { 0 };
-		snprintf(buf, 2048, "guest:%d say:%s", id, msg.content);
-
-		chat_room_msg sendmsg;
-		sendmsg.set_content(buf, strlen(buf));
-
-		return sendmsg;
-	}
-
-	void broad_cast(const chat_room_msg& msg)
-	{
-		cout << msg.content << endl;
-
-		int32_t bytes = 0;
-		char sendbuf[1024] = { 0 };
-		msg.write_to_buf(sendbuf, &bytes);
-		
-		m_tcp_server->get_conn_mgr().broadcast(sendbuf, bytes);
-	}
-
 	void accept_handler(xsix::TCPServerPtr server, xsix::TCPConnPtr conn, const asio::error_code& ec)
 	{
 		if (!server || !conn)
@@ -93,19 +71,29 @@ private:
 			peeksize = conn->m_recv_buffer.peek(&msg.header, sizeof(chat_room_msg_header));
 			if (peeksize != sizeof(chat_room_msg_header))
 			{
+				std::cout << "id : " << conn->get_id() << " peeksize error" << std::endl;
 				break;
 			}
 
 			msg.header.contentsize = ntohs(msg.header.contentsize);
-			if (msg.header.contentsize <= 0 || conn->m_recv_buffer.length() < msg.header.contentsize)
+			if (msg.header.contentsize <= 0 || 
+				conn->m_recv_buffer.length() < msg.header.contentsize + sizeof(chat_room_msg_header))
 			{
+				std::cout << "id : " << conn->get_id()
+						  << " content wrong : " << msg.header.contentsize
+						  << " : " << conn->m_recv_buffer.length() << std::endl;
 				break;
 			}
 
-			conn->m_recv_buffer.skip(sizeof(chat_room_msg_header));
-			conn->m_recv_buffer.write_to(msg.content, msg.header.contentsize);
-			chat_room_msg sendbackmsg = get_sendback_msg(conn->get_id(), msg);
-			broad_cast(sendbackmsg);
+			XASSERT(conn->m_recv_buffer.skip(sizeof(chat_room_msg_header)));
+			XASSERT(conn->m_recv_buffer.write_to(msg.content, msg.header.contentsize));
+
+			//sendback
+			int32_t bytes = 0;
+			char sendbuf[1024] = { 0 };
+			msg.write_to_buf(sendbuf, &bytes);
+			//m_tcp_server->broadcast(sendbuf, bytes);
+			conn->send(sendbuf, bytes);
 		}
 	}
 
@@ -117,7 +105,6 @@ public:
 	{
 		xsix::ActorBase::tick();
 		m_tcp_server->tick();
-		//m_tcp_server->get_conn_mgr().print_conn_state();
 	}
 
 private:

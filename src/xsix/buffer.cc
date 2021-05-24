@@ -337,11 +337,12 @@ namespace xsix
 				XFREE(m_data);
 			}
 			m_data = (char*)XMALLOC(len);
-			XASSERT(m_data);
-			m_head = 0;
-			m_tail = len;
+			XASSERT(m_data);	
 			m_size = size;
+			m_head = 0;
+			m_tail = (m_tail + size) % m_size;
 			memcpy(&m_data[0], src, len);
+			m_full = m_tail == m_size ? true : false;
 		}
 	}
 

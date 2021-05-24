@@ -9,6 +9,7 @@
 #include <functional>
 #include <atomic>
 #include <map>
+#include <array>
 
 //platform define
 #if ( defined(_WIN32) || defined(_WIN64) )

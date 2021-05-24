@@ -34,8 +34,8 @@ namespace xsix
 		void loop();
 
 		void tick();
-		
-		xsix::TCPConnManager& get_conn_mgr() { return m_tcp_conn_mgr; }
+
+		void broadcast(const char* msg, int32_t size);
 
 	public:
 

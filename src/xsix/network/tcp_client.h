@@ -65,22 +65,26 @@ namespace xsix
 
 		void async_send();
 
+		void sync_send();
+
 		void handle_message();
 
 		void handle_error(const asio::error_code& ec);
 
 	public:
 
-		xsix::buffer		  m_send_buffer;
-		xsix::buffer		  m_recv_buffer;
+		xsix::buffer			m_send_buffer;
+		xsix::buffer			m_recv_buffer;
+		std::array<char, 1024>	m_recv_sequence;
+		bool				    m_is_sending = false;
 
 	private:
 
 		asio::io_context	    m_ctx;
 		asio::ip::tcp::socket   m_tcp_socket;
 
-		CloseHandler		  m_close_handler;
-		MessageHandler		  m_message_handler;
-		ConnectedHandler	  m_connected_handler;
+		CloseHandler			m_close_handler;
+		MessageHandler			m_message_handler;
+		ConnectedHandler		m_connected_handler;
 	};
 }

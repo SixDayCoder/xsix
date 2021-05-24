@@ -7,7 +7,7 @@
 namespace xsix
 {
 
-	TCPClient::TCPClient() : m_tcp_socket(m_ctx) {}
+	TCPClient::TCPClient() : m_tcp_socket(m_ctx), m_recv_buffer(), m_send_buffer() {}
 
 	void TCPClient::async_connect(asio::ip::tcp::endpoint ep)
 	{
@@ -72,8 +72,7 @@ namespace xsix
 			return;
 		}
 
-		char buf[4096] = { 0 };
-		m_tcp_socket.async_read_some(asio::buffer(buf),
+		m_tcp_socket.async_read_some(asio::buffer(m_recv_sequence),
 			[&](const asio::error_code& ec, std::size_t bytes) {
 				if (ec)
 				{
@@ -81,7 +80,7 @@ namespace xsix
 					return;
 				}
 
-				m_recv_buffer.append(buf, bytes);
+				m_recv_buffer.append(m_recv_sequence.data(), bytes);
 
 				//fire another event
 				async_recv();
@@ -90,6 +89,42 @@ namespace xsix
 	}
 
 	void TCPClient::async_send()
+	{
+		if (!m_tcp_socket.is_open())
+		{
+			return;
+		}
+
+		if (m_is_sending)
+		{
+			std::cout << "async send is sending" << std::endl;
+			return;
+		}
+
+		if (m_send_buffer.empty())
+		{
+			return;
+		}
+
+		char buf[4096] = { 0 };
+		int32_t writesize = m_send_buffer.write_to(buf, 4096);
+		if (writesize > 0)
+		{
+			m_is_sending = true;
+			asio::async_write(m_tcp_socket, asio::buffer(buf, writesize),
+				[&](const asio::error_code& ec, std::size_t bytes) {
+					m_is_sending = false;
+					if (ec)
+					{
+						handle_error(ec);
+						return;
+					}
+				}
+			);
+		}
+	}
+
+	void TCPClient::sync_send()
 	{
 		if (!m_tcp_socket.is_open())
 		{
@@ -105,15 +140,13 @@ namespace xsix
 		int32_t writesize = m_send_buffer.write_to(buf, 4096);
 		if (writesize > 0)
 		{
-			asio::async_write(m_tcp_socket, asio::buffer(buf, writesize),
-				[&](const asio::error_code& ec, std::size_t bytes) {
-					if (ec)
-					{
-						handle_error(ec);
-						return;
-					}
-				}
-			);
+			asio::error_code ec;
+			asio::write(m_tcp_socket, asio::buffer(buf, writesize), ec);
+			if (ec)
+			{
+				handle_error(ec);
+				return;
+			}
 		}
 	}
 

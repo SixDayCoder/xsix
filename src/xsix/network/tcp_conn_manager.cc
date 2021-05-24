@@ -63,12 +63,14 @@ namespace xsix
 		{
 			if (it->second)
 			{
-				printf("conn:%d, recvsize:(%d:%d) recvht(%d:%d) sendsize:(%d:%d) sendht:(%d,%d)\n",
+				printf("conn:%d, recvsize:(%d:%d) recvht(%d:%d) sendsize:(%d:%d) sendht:(%d,%d) fullstate(%s,%s)\n",
 					it->second->get_id(),
 					it->second->m_recv_buffer.length(), it->second->m_recv_buffer.get_free_size(),
 					it->second->m_recv_buffer.headpos(), it->second->m_recv_buffer.tailpos(),
 					it->second->m_send_buffer.length(), it->second->m_send_buffer.get_free_size(),
-					it->second->m_send_buffer.headpos(), it->second->m_send_buffer.tailpos()
+					it->second->m_send_buffer.headpos(), it->second->m_send_buffer.tailpos(),
+					it->second->m_recv_buffer.full() ? "full" : "no",
+					it->second->m_send_buffer.full() ? "full" : "no"
 					);
 			}
 		}

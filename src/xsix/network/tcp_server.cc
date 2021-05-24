@@ -1,4 +1,5 @@
 #include "tcp_server.h"
+#include <iostream>
 
 namespace xsix
 {
@@ -79,6 +80,15 @@ namespace xsix
 				  it != m_tcp_conn_mgr.m_tcp_conn_map.end(); it++)
 		{
 			it->second->tick();
+		}
+	}
+
+	void TCPServer::broadcast(const char* msg, int32_t size)
+	{
+		for (auto it = m_tcp_conn_mgr.m_tcp_conn_map.begin();
+			it != m_tcp_conn_mgr.m_tcp_conn_map.end(); it++)
+		{
+			it->second->send(msg, size);
 		}
 	}
 

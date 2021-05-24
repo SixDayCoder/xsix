@@ -5,48 +5,15 @@
 #include <iostream>
 #include <functional>
 #include <chrono>
-#include <random>
-#include <atomic>
 using namespace std;
 
-asio::io_context ctx;
-
-std::string random_str()
+void send_random_msg(xsix::TCPClientPtr client)
 {
-	std::string str = "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-	std::random_device rdv;	
-	static std::default_random_engine e{ rdv() };
-	static std::uniform_int_distribution<uint32_t> u1(10, 20);
-	static std::uniform_int_distribution<uint32_t> u2(0, str.length());
-
-	auto cnt = u1(e);
-	std::string result("empty");
-	for (int32_t i = 0; i < cnt; ++i)
-	{
-		int32_t index = u2(e);
-		result.push_back(str[index]);
-	}
-	return result;
-}
-
-void generate_msg(xsix::TCPClientPtr client)
-{
-	std::default_random_engine e;
-	std::uniform_int_distribution<uint32_t> u(1, 3);
-
-	std::string s = random_str();
-	chat_room_msg msg;
-	msg.set_content(s.c_str(), s.length());
-
+	chat_room_msg msg = chat_room_msg::get_random_msg();
 	int32_t bytes = 0;
 	char sendbuf[1024] = { 0 };
 	msg.write_to_buf(sendbuf, &bytes);
-
 	client->send(sendbuf, bytes);
-	client->get_context().post(std::bind(generate_msg, client));
-	//TODO:massive message hanlder
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 void connected(xsix::TCPClientPtr ptr)
@@ -56,7 +23,7 @@ void connected(xsix::TCPClientPtr ptr)
 		return;
 	}
 	cout << "connected ready input!" << endl;
-	ptr->get_context().post(std::bind(generate_msg, ptr));
+	send_random_msg(ptr);
 }
 
 void chat(xsix::TCPClientPtr conn)
@@ -81,18 +48,23 @@ void chat(xsix::TCPClientPtr conn)
 		peeksize = conn->m_recv_buffer.peek(&msg.header, sizeof(chat_room_msg_header));
 		if (peeksize != sizeof(chat_room_msg_header))
 		{
+			std::cout <<  "peeksize error" << std::endl;
 			break;
 		}
 
 		msg.header.contentsize = ntohs(msg.header.contentsize);
-		if (msg.header.contentsize <= 0 || conn->m_recv_buffer.length() < msg.header.contentsize)
+		if (msg.header.contentsize <= 0 || 
+			conn->m_recv_buffer.length() < msg.header.contentsize + sizeof(chat_room_msg_header))
 		{
+			std::cout <<  "client content wrong : " << msg.header.contentsize << " : " << conn->m_recv_buffer.length() << std::endl;
 			break;
 		}
 
-		conn->m_recv_buffer.skip(sizeof(chat_room_msg_header));
-		writesize = conn->m_recv_buffer.write_to(msg.content, msg.header.contentsize);
+		XASSERT(conn->m_recv_buffer.skip(sizeof(chat_room_msg_header)));
+		XASSERT(conn->m_recv_buffer.write_to(msg.content, msg.header.contentsize));
+
 		std::cout << msg.content << std::endl;
+		send_random_msg(conn);
 	}
 }
 

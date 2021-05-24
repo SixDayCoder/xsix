@@ -65,8 +65,7 @@ namespace xsix
 			return;
 		}
 
-		char buf[4096] = { 0 };
-		m_tcp_socket.async_read_some(asio::buffer(buf),
+		m_tcp_socket.async_read_some(asio::buffer(m_recv_sequence),
 			[&](const asio::error_code& ec, std::size_t bytes) {
 				if (ec)
 				{
@@ -74,7 +73,7 @@ namespace xsix
 					return;
 				}
 
-				m_recv_buffer.append(buf, bytes);
+				XASSERT(m_recv_buffer.append(m_recv_sequence.data(), bytes) > 0);
 
 				//fire another event
 				async_recv();
@@ -97,6 +96,12 @@ namespace xsix
 			return;
 		}
 
+		if (m_is_sending)
+		{
+			std::cout << "async send is sending" << std::endl;
+			return;
+		}
+
 		if (m_send_buffer.empty())
 		{
 			return;
@@ -106,15 +111,44 @@ namespace xsix
 		int32_t writesize = m_send_buffer.write_to(buf, 4096);
 		if (writesize > 0)
 		{
+			m_is_sending = true;
 			asio::async_write(m_tcp_socket, asio::buffer(buf, writesize),
 				[&](const asio::error_code& ec, std::size_t bytes) {
+					m_is_sending = false;
 					if (ec)
 					{
 						handle_error(ec);
 						return;
-					}
+					}		
 				}
 			);
 		}
 	}
+
+	void TCPConn::sync_send()
+	{
+		if (!m_tcp_socket.is_open())
+		{
+			return;
+		}
+
+		if (m_send_buffer.empty())
+		{
+			return;
+		}
+
+		char buf[4096] = { 0 };
+		int32_t writesize = m_send_buffer.write_to(buf, 4096);
+		if (writesize > 0)
+		{
+			asio::error_code ec;
+			asio::write(m_tcp_socket, asio::buffer(buf, writesize), ec);
+			if (ec)
+			{
+				handle_error(ec);
+				return;
+			}
+		}
+	}
+
 }

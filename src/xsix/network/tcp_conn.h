@@ -35,7 +35,7 @@ namespace xsix
 
 	public:
 
-		TCPConn(asio::io_context& ctx) : m_tcp_socket(ctx) {}
+		TCPConn(asio::io_context& ctx) : m_tcp_socket(ctx), m_recv_buffer(), m_send_buffer() {}
 
 	public:
 
@@ -83,10 +83,14 @@ namespace xsix
 
 		void async_send();
 
+		void sync_send();
+
 	public:
 
-		xsix::buffer		  m_recv_buffer;
-		xsix::buffer		  m_send_buffer;
+		xsix::buffer		   m_recv_buffer;
+		xsix::buffer		   m_send_buffer;
+		std::array<char, 1024> m_recv_sequence;
+		bool				   m_is_sending = false;
 
 	private:
 
