@@ -14,7 +14,7 @@ void connected(xsix::TCPClientPtr ptr)
 	}
 	std::string msg = "sixday";
 	printf("connected! ready send msg : %s, size : %d\n", msg.c_str(), msg.size());
-	ptr->send(msg);
+	ptr->send(msg.c_str(), msg.length());
 }
 
 void echo(xsix::TCPClientPtr conn)
@@ -36,6 +36,8 @@ void echo(xsix::TCPClientPtr conn)
 		printf("tcp client recv : %s\n", buf);
 		conn->send(buf, size);
 	}
+
+	std::this_thread::sleep_for(std::chrono::microseconds(50));
 }
 
 int main()

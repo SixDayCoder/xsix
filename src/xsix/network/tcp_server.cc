@@ -19,7 +19,7 @@ namespace xsix
 	{
 		auto self(shared_from_this());
 
-		TCPConnPtr conn(new TCPConn(m_ctx));	
+		TCPConnPtr conn(new TCPConn(m_ctx, m_tcp_conn_mgr));	
 		conn->set_state(TCPConn::STATE_CONNECTING);
 		conn->set_message_handler(m_conn_message_handler);
 		conn->set_close_handler([self](TCPConnPtr ptr, const asio::error_code& ec) {
@@ -73,9 +73,8 @@ namespace xsix
 			return;
 		}
 
-		//poll for async_accept/conntions async_recv/async_send
 		auto executed_events = m_ctx.poll();
-		//connection tick 
+	 
 		for (auto it = m_tcp_conn_mgr.m_tcp_conn_map.begin(); 
 				  it != m_tcp_conn_mgr.m_tcp_conn_map.end(); it++)
 		{
@@ -90,6 +89,11 @@ namespace xsix
 		{
 			it->second->send(msg, size);
 		}
+	}
+
+	xsix::TCPConnPtr TCPServer::get_conn_ptr(int32_t connid)
+	{
+		return m_tcp_conn_mgr.find_conn(connid);
 	}
 
 }

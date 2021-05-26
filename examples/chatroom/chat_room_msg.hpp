@@ -3,6 +3,8 @@
 #include <iostream>
 #include <random>
 #include <atomic>
+#include <vector>
+#include <array>
 
 struct chat_room_msg_header
 {
@@ -21,33 +23,15 @@ public:
 	void clear()
 	{
 		header.contentsize = 0;
-		memset(content, 0, 1024);
 	}
 
-	chat_room_msg(const chat_room_msg& msg)
-	{
-		clear();
-		this->header = msg.header;
-		memcpy(this->content, msg.content, 1024);
-	}
-	
-	chat_room_msg& operator=(const chat_room_msg& msg)
-	{
-		if (this != &msg)
-		{
-			clear();
-			this->header = msg.header;
-			memcpy(this->content, msg.content, 1024);
-		}
-		return *this;
-	}
+	chat_room_msg_header   header;
+	std::array<char, 1024> content;
 
-	chat_room_msg_header header;
-	char content[1024];
 
 public:
 
-	static chat_room_msg get_random_msg()
+	static std::string get_random_msg()
 	{
 		std::string str = "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -58,41 +42,42 @@ public:
 
 		auto cnt = u1(e) + 1;
 		std::string result("");
-		for (int32_t i = 0; i < cnt; ++i)
+		for (int32_t i = 0; i < 10; ++i)
 		{
 			int32_t index = u2(e);
 			result.push_back(str[index]);
 		}
-		
-		chat_room_msg msg;
-		msg.set_content(result.c_str(), result.length());
-		return msg;
+	
+		return result;
 	}
 
 public:
 
 	void set_content(const char* src, int32_t size)
 	{
-		if (!src || size < 0)
-		{
-			std::cout << "set_content fail!" << std::endl;
-			return;
-		}
-		memcpy(content, src, size);
+		memcpy(&content[0], src, size);
 		header.contentsize = (uint16_t)size;
 	}
 
-	void write_to_buf(char* buf, int32_t* bytes) const
+	std::string get_content()
 	{
+		std::string s;
+		s.assign(&content[0], header.contentsize);
+		return s;
+	}
+
+	std::vector<char> get_buf()
+	{
+		char buf[4096] = { 0 };
 		uint16_t size = htons(header.contentsize);
-		memcpy(buf, &size, sizeof(size));	
-		memcpy(buf + sizeof(chat_room_msg_header), content, header.contentsize);
-		*bytes = sizeof(chat_room_msg_header) + header.contentsize;
+		memcpy(buf, &size, sizeof(chat_room_msg_header));
+		memcpy(buf + sizeof(chat_room_msg_header), &content[0], header.contentsize);	
+		return std::vector<char>(buf, buf + sizeof(chat_room_msg_header) + header.contentsize);
 	}
 
 	friend std::ostream& operator<<(std::ostream& out, const chat_room_msg& msg)
 	{
-		out << "content : " << msg.content << " size : " << msg.header.contentsize;
+		out << "content : " << msg.content.data() << " size : " << msg.header.contentsize;
 		return out;
 	}
 };

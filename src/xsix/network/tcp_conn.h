@@ -9,8 +9,9 @@
 
 namespace xsix
 {
-	class TCPConn;
+	class TCPConnManager;
 
+	class TCPConn;
 	using TCPConnPtr = std::shared_ptr<TCPConn>;
 
 	class TCPConn : public INonCopyable, 
@@ -35,11 +36,20 @@ namespace xsix
 
 	public:
 
-		TCPConn(asio::io_context& ctx) : m_tcp_socket(ctx), m_recv_buffer(), m_send_buffer() {}
+		TCPConn(asio::io_context& ctx, TCPConnManager& mgr) :
+			m_conn_mgr(mgr),
+			m_io_context(ctx),
+			m_tcp_socket(ctx), 
+			m_recv_buffer(), 
+			m_send_buffer() {}
+
+		virtual ~TCPConn() {}
 
 	public:
 
 		asio::ip::tcp::socket& socket() { return m_tcp_socket; }
+
+		xsix::TCPConnManager&  get_conn_manager() { return m_conn_mgr; }
 
 		const std::string local_ip() const { return m_tcp_socket.local_endpoint().address().to_string(); }
 
@@ -53,7 +63,7 @@ namespace xsix
 
 		int32_t get_id() const { return m_id; }
 
-		void set_state(int32_t state) { m_state = state; }
+		void	set_state(int32_t state) { m_state = state; }
 
 		int32_t get_state() const { return m_state; }
 
@@ -65,6 +75,10 @@ namespace xsix
 
 		void send(const char* msg, int32_t msgsize);
 
+		asio::io_context& get_context() { return m_io_context; }
+
+	public:
+
 		void set_close_handler(CloseHandler handler) { m_close_handler = handler; }
 
 		void set_message_handler(MessageHandler handler) { m_message_handler = handler; }
@@ -75,30 +89,29 @@ namespace xsix
 
 		void handle_error(const asio::error_code& ec);
 
-	private:
+	protected:
 
 		void handle_message();
 
 		void async_recv();
 
-		void async_send();
-
-		void sync_send();
-
 	public:
 
 		xsix::buffer		   m_recv_buffer;
 		xsix::buffer		   m_send_buffer;
-		std::array<char, 1024> m_recv_sequence;
-		bool				   m_is_sending = false;
 
 	private:
 
 		int32_t				  m_id = -1;
 		int32_t				  m_state = STATE_INVALID;
-		asio::ip::tcp::socket m_tcp_socket;
 
 		CloseHandler		  m_close_handler;
 		MessageHandler		  m_message_handler;
+
+	protected:
+
+		xsix::TCPConnManager&  m_conn_mgr;
+		asio::io_context&	   m_io_context;
+		asio::ip::tcp::socket  m_tcp_socket;
 	};
 }

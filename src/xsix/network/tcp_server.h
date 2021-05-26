@@ -37,6 +37,8 @@ namespace xsix
 
 		void broadcast(const char* msg, int32_t size);
 
+		TCPConnPtr get_conn_ptr(int32_t connid);
+
 	public:
 
 		void set_accept_handler(AcceptHandler handler) { m_accept_handler = handler; }

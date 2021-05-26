@@ -49,8 +49,6 @@ namespace xsix
 
 		void send(const char* msg, std::size_t msgsize);
 
-		void send(const std::string& s);
-
 		void loop();
 
 		void tick();
@@ -63,10 +61,6 @@ namespace xsix
 
 		void async_recv();
 
-		void async_send();
-
-		void sync_send();
-
 		void handle_message();
 
 		void handle_error(const asio::error_code& ec);
@@ -75,8 +69,6 @@ namespace xsix
 
 		xsix::buffer			m_send_buffer;
 		xsix::buffer			m_recv_buffer;
-		std::array<char, 1024>	m_recv_sequence;
-		bool				    m_is_sending = false;
 
 	private:
 
