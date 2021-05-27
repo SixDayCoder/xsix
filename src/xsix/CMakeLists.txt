@@ -33,8 +33,8 @@ set(SRC_FILES
 	${ROOT_PROJECT_DIR}/src/xsix/log/logger.cc
 	${ROOT_PROJECT_DIR}/src/xsix/log/log_define.cc
 
-	${ROOT_PROJECT_DIR}/src/xsix/utils/math_utils.cc
-	${ROOT_PROJECT_DIR}/src/xsix/utils/string_utils.cc
+	${ROOT_PROJECT_DIR}/src/xsix/utils/math_utils.hpp
+	${ROOT_PROJECT_DIR}/src/xsix/utils/string_utils.hpp
 
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_conn.cc
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_conn_manager.cc
