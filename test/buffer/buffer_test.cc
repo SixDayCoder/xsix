@@ -1,4 +1,4 @@
-#include "xsix/buffer.h"
+#include "xsix/buffer.hpp"
 #include <assert.h>
 
 #include <iostream>
@@ -79,13 +79,13 @@ int main()
 		ASSERT_STRING_EQUAL(tmp, "1234");
 		ASSERT_CONDITION(buf, 0, 4, 4);
 
-		buf.append("567");
+		buf.append("567", 3);
 		memset(tmp, 0, sizeof(tmp));
 		buf.peek(tmp, buf.length());
 		ASSERT_STRING_EQUAL(tmp, "1234567");
 		ASSERT_CONDITION(buf, 0, 7, 7);
 
-		buf.append(build_x_string(58));
+		buf.append(build_x_string(58).c_str(), 58);
 		memset(tmp, 0, sizeof(tmp));
 		buf.peek(tmp, buf.length());
 		ASSERT_STRING_EQUAL(tmp, buf.retrieve_all_as_string().c_str());
@@ -96,25 +96,25 @@ int main()
 		ASSERT_STRING_EQUAL(tmp, (std::string("1234567") + build_x_string(43)).c_str());
 		ASSERT_CONDITION(buf, 50, 65, 15);
 
-		buf.append(build_x_string(100));
+		buf.append(build_x_string(100).c_str(), 100);
 		memset(tmp, 0, sizeof(tmp));
 		buf.peek(tmp, buf.length());
 		ASSERT_STRING_EQUAL(tmp, build_x_string(115).c_str());
 		ASSERT_CONDITION(buf, 50, 37, 115);
 
-		buf.append(build_x_string(12));
+		buf.append(build_x_string(12).c_str(), 12);
 		memset(tmp, 0, sizeof(tmp));
 		buf.peek(tmp, buf.length());
 		ASSERT_STRING_EQUAL(tmp, build_x_string(127).c_str());
 		ASSERT_CONDITION(buf, 50, 49, 127);
 
-		buf.append(build_x_string(1));
+		buf.append(build_x_string(1).c_str(), 1);
 		memset(tmp, 0, sizeof(tmp));
 		buf.peek(tmp, buf.length());
 		ASSERT_STRING_EQUAL(tmp, build_x_string(128).c_str());
 		ASSERT_CONDITION(buf, 50, 50, 128);
 
-		buf.append(build_x_string(1));
+		buf.append(build_x_string(1).c_str(), 1);
 		memset(tmp, 0, sizeof(tmp));
 		buf.peek(tmp, buf.length());
 		ASSERT_STRING_EQUAL(tmp, build_x_string(129).c_str());

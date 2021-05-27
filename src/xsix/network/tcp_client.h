@@ -3,7 +3,7 @@
 #include "xsix/common_define.h"
 #include "xsix/noncopyable.h"
 #include "xsix/time/timestamp.h"
-#include "xsix/buffer.h"
+#include "xsix/buffer.hpp"
 
 #include "asio.hpp"
 
