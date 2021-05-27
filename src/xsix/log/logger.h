@@ -4,14 +4,6 @@
 #include "xsix/fmt.hpp"
 #include "xsix/time/timestamp.h"
 
-#include <memory>
-#include <mutex>
-#include <list>
-#include <map>
-#include <algorithm>
-#include <array>
-#include <stdio.h>
-
 namespace xsix
 {
 	class Logger;
@@ -82,15 +74,12 @@ namespace xsix
 	private:
 
 		LoggerManager*			 m_logger_manager;
-
 		std::mutex				 m_mutex;
 
 		std::string				 m_log_file_name;
-
 		std::string				 m_log_file_path;
 		
 		CacheBlockPtr			 m_curr_cache_block;
-
 		std::list<CacheBlockPtr> m_ready_flush_cache_block_list;
 	};
 }

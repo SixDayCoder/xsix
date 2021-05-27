@@ -17,7 +17,7 @@ namespace xsix
 
 	public:
 
-		buffer(int32_t init_size = BUFFER_SIZE_SMALL)
+		buffer(int32_t init_size = BUFFER_SIZE_SMALL) : m_data(nullptr)
 		{
 			cleanup();
 			init_size = init_size > BUFFER_SIZE_SMALL ? init_size : BUFFER_SIZE_SMALL;
@@ -25,7 +25,7 @@ namespace xsix
 			resize(init_size);
 		}
 
-		explicit buffer(const std::string& s)
+		explicit buffer(const std::string& s) : m_data(nullptr)
 		{
 			cleanup();
 			copy_from(s.c_str(), s.length(), s.length() + s.length() / 2);
@@ -306,8 +306,9 @@ namespace xsix
 
 		void cleanup()
 		{
-			if (m_data)
+			if (m_data != nullptr)
 			{
+				//TODO:bug
 				XFREE(m_data);
 			}
 			m_data = nullptr;

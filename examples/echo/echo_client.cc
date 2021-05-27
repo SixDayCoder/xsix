@@ -3,63 +3,66 @@
 #include <thread>
 #include <iostream>
 
-#include "xsix/network/tcp_client.h"
+#include "xsix/network/tcp_client.hpp"
 
-
-void connected(xsix::TCPClientPtr ptr)
+class EchoClient : public xsix::net::TCPClient
 {
-	if (!ptr)
-	{
-		return;
-	}
-	std::string msg = "sixday";
-	printf("connected! ready send msg : %s, size : %d\n", msg.c_str(), msg.size());
-	ptr->send(msg.c_str(), msg.length());
-}
+public:
 
-void echo(xsix::TCPClientPtr conn)
-{
-	if (!conn)
-	{
-		return;
-	}
+	EchoClient() : xsix::net::TCPClient() {}
 
-	if (conn->m_recv_buffer.empty())
+protected:
+
+	virtual void handle_connection_established() override
 	{
-		return;
+		xsix::net::TCPClient::handle_connection_established();
+
+		std::cout << "[EchoClient] connection established "
+			<< " local address : " << local_address()
+			<< " remote address : " << remote_address() << std::endl;
+		std::string msg = "sixday";
+		send(msg.c_str(), msg.length());
 	}
 
-	char buf[4096] = { 0 };
-	int32_t size = conn->m_recv_buffer.write_to(buf, 4096);
-	if (size > 0)
+	virtual void handle_message() override
 	{
-		printf("tcp client recv : %s\n", buf);
-		conn->send(buf, size);
+		if (m_recv_buffer.empty())
+		{
+			return;
+		}
+
+		char buf[4096] = { 0 };
+		int32_t size = m_recv_buffer.write_to(buf, 4096);
+		if (size > 0)
+		{
+			std::cout << "[EchoClient] recv : " << std::string(buf, size) << std::endl;
+			send(buf, size);
+		}
 	}
 
-	std::this_thread::sleep_for(std::chrono::microseconds(50));
-}
+	virtual void handle_error(const asio::error_code& ec) override
+	{
+		xsix::net::TCPClient::handle_error(ec);
+
+		if (ec == asio::error::eof ||
+			ec == asio::error::connection_reset)
+		{
+			std::cout << "[EchoClient] server closed : " << ec.message() << std::endl;
+		}
+		else
+		{
+			std::cout << "[EchoClient] client error : " << ec.message() << std::endl;
+		}
+	}
+
+};
+using EchoClientPtr = std::shared_ptr<EchoClient>;
 
 int main()
 {
 	asio::ip::tcp::endpoint ep(asio::ip::address::from_string("127.0.0.1"), 8888);
-	std::vector<std::thread> thread_vec;
-
-	for (int32_t i = 0; i < 20; ++i)
-	{
-		xsix::TCPClientPtr client(new xsix::TCPClient());
-		client->set_connected_handler(connected);
-		client->set_message_handler(echo);
-		client->async_connect(ep);
-
-		std::thread th(std::bind(&xsix::TCPClient::loop, client));
-		thread_vec.emplace_back(std::move(th));		
-	}
-
-	for (auto& th : thread_vec)
-	{
-		th.join();
-	}
-
+	EchoClientPtr client(new EchoClient());
+	client->async_connect(ep);
+	client->loop();
 	return 0;
 }

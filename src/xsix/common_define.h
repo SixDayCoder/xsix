@@ -11,6 +11,7 @@
 #include <map>
 #include <array>
 #include <list>
+#include <mutex>
 
 //platform define
 #if ( defined(_WIN32) || defined(_WIN64) )
