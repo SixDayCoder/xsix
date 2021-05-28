@@ -45,7 +45,12 @@ namespace xsix
 			return e;
 		}
 
-		size_t size()
+		bool empty() const
+		{
+			return m_queue.empty();
+		}
+
+		std::size_t size() const
 		{
 			std::unique_lock<std::mutex> lock(m_mutex);
 			return m_queue.size();
@@ -53,10 +58,8 @@ namespace xsix
 		
 	private:
 
-		std::mutex				m_mutex;
-
+		mutable std::mutex		m_mutex;
 		std::condition_variable m_cond_not_empty;
-
 		std::deque<ElemT>		m_queue;
 
 	};

@@ -29,6 +29,7 @@ set(SRC_FILES
 	${ROOT_PROJECT_DIR}/src/xsix/block_queue.hpp
 	${ROOT_PROJECT_DIR}/src/xsix/buffer.hpp
 	${ROOT_PROJECT_DIR}/src/xsix/fmt.hpp
+	${ROOT_PROJECT_DIR}/src/xsix/thread_safe_list.hpp
 
 	${ROOT_PROJECT_DIR}/src/xsix/log/logger.cc
 	${ROOT_PROJECT_DIR}/src/xsix/log/log_define.cc

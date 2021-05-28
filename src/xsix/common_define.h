@@ -3,15 +3,19 @@
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
-#include <string>
-#include <vector>
+
 #include <memory>
 #include <functional>
-#include <atomic>
+
+#include <string>
+#include <vector>
 #include <map>
 #include <array>
 #include <list>
+
+#include <atomic>
 #include <mutex>
+#include <thread>
 
 //platform define
 #if ( defined(_WIN32) || defined(_WIN64) )

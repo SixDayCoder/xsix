@@ -6,25 +6,18 @@ class Connection : public xsix::net::TCPConnection
 {
 public:
 
-	Connection(asio::io_context& ctx) : xsix::net::TCPConnection(ctx) {}
+	Connection(asio::io_context& ctx) : 
+		xsix::net::TCPConnection(ctx)
+	{}
+
+public:
+
+	virtual void start() override
+	{
+		async_recv();
+	}
 
 protected:
-
-	virtual void handle_message() override
-	{
-		if (m_recv_buffer.empty())
-		{
-			return;
-		}
-
-		char buf[4096] = { 0 };
-		int32_t size = m_recv_buffer.write_to(buf, 4096);
-		if (size > 0)
-		{
-			std::cout << "[Connection] recv : " << std::string(buf, size) << std::endl;
-			send(buf, size);
-		}
-	}
 
 	virtual void handle_error(const asio::error_code& ec) override
 	{
@@ -35,6 +28,61 @@ protected:
 			std::cout << "[Connection] client closed : " << get_id() << std::endl;
 		}
 	}
+
+private:
+
+	void send(const char* msg, int32_t msgsize)
+	{
+		if (!msg || msgsize < 0)
+		{
+			return;
+		}
+
+		if (!m_tcp_socket.is_open())
+		{
+			return;
+		}
+
+		char buf[4096] = { 0 };
+		memcpy(buf, msg, msgsize);
+		asio::async_write(m_tcp_socket, asio::buffer(buf, msgsize),
+			[&](const asio::error_code& ec, std::size_t bytes) {
+				if (ec)
+				{
+					handle_error(ec);
+					return;
+				}
+			}
+		);
+	}
+
+	void async_recv()
+	{
+		if (!m_tcp_socket.is_open())
+		{
+			return;
+		}
+
+		m_tcp_socket.async_read_some(asio::buffer(m_recv_buffer),
+			[&](const asio::error_code& ec, std::size_t bytes) {
+				if (ec)
+				{
+					handle_error(ec);
+					return;
+				}
+
+				std::string msg(m_recv_buffer.data(), bytes);
+				std::cout << "[Connection] recv : " << msg << std::endl;
+				send(msg.c_str(), msg.length());
+
+				async_recv();
+			}
+		);
+	}
+
+private:
+
+	std::array<char, 1024> m_recv_buffer;	
 };
 using ConnectionPtr = std::shared_ptr<Connection>;
 
@@ -43,8 +91,8 @@ class EchoServer : public xsix::net::TCPServer<Connection>
 {
 public:
 
-	EchoServer(asio::io_context& ctx, uint16_t port) : 
-			  xsix::net::TCPServer<Connection>(ctx, port) {}
+	EchoServer(asio::io_context& ctx, uint16_t port) :
+		xsix::net::TCPServer<Connection>(ctx, port) {}
 
 public:
 
@@ -54,9 +102,9 @@ public:
 		std::cout << "[EchoServer] handle new connection : " << connptr->get_id() << std::endl;
 	}
 
-	virtual void handle_close_connection(ConnectionPtr connptr, const asio::error_code& ec) override
+	virtual void handle_remove_connection(ConnectionPtr connptr) override
 	{
-		xsix::net::TCPServer<Connection>::handle_close_connection(connptr, ec);
+		xsix::net::TCPServer<Connection>::handle_remove_connection(connptr);
 		std::cout << "[EchoServer] close connection : " << connptr->get_id() << std::endl;
 	}
 };

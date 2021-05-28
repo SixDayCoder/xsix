@@ -66,7 +66,7 @@ public:
 		return s;
 	}
 
-	std::vector<char> get_buf()
+	std::vector<char> get_buf() const
 	{
 		char buf[4096] = { 0 };
 		uint16_t size = htons(header.contentsize);
