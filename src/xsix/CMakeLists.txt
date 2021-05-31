@@ -34,6 +34,7 @@ set(SRC_FILES
 	${ROOT_PROJECT_DIR}/src/xsix/log/logger.cc
 	${ROOT_PROJECT_DIR}/src/xsix/log/log_define.cc
 
+	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_base_interface.hpp
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_client.hpp
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_connection.hpp
 	${ROOT_PROJECT_DIR}/src/xsix/network/tcp_server.hpp

@@ -5,6 +5,8 @@
 #include "xsix/time/timestamp.h"
 #include "xsix/buffer.hpp"
 
+#include "tcp_base_interface.hpp"
+
 #include "asio.hpp"
 
 namespace xsix
@@ -15,7 +17,8 @@ namespace xsix
 		{
 		public:
 
-			TCPConnection(asio::io_context& ctx) :
+			TCPConnection(asio::io_context& ctx, ITCPConnectionParent* parent) :
+				m_tcp_conenction_parent(parent),
 				m_io_context(ctx),
 				m_tcp_socket(ctx)
 			{}
@@ -26,6 +29,7 @@ namespace xsix
 
 			asio::ip::tcp::socket& socket() { return m_tcp_socket; }
 			asio::io_context& get_context() { return m_io_context; }
+			bool is_valid() const { return m_tcp_socket.is_open(); }
 
 		public:
 
@@ -41,18 +45,24 @@ namespace xsix
 			void    set_id(int32_t id) { m_id = id; }
 			int32_t get_id() const { return m_id; }
 
-			bool	is_valid() const { return m_tcp_socket.is_open(); }
+		public:
+
+			void broadcast(const char* msg, std::size_t msgsize)
+			{
+				if (m_tcp_conenction_parent)
+				{
+					m_tcp_conenction_parent->broadcast(msg, msgsize);
+				}		
+			}
 
 		public:
 
 			virtual void start() {}
-
 			virtual void tick() {}
 
 		protected:
 
 			virtual void handle_message() {}
-
 			virtual void handle_error(const asio::error_code& ec)
 			{
 				if (!m_tcp_socket.is_open())
@@ -65,11 +75,10 @@ namespace xsix
 		protected:
 
 			int32_t	m_id = -1;
-
-			asio::io_context&	   m_io_context;
-			asio::ip::tcp::socket  m_tcp_socket;
+			ITCPConnectionParent*	m_tcp_conenction_parent;
+			asio::io_context&		m_io_context;
+			asio::ip::tcp::socket	m_tcp_socket;
 		};
-
 		using TCPConnectionPtr = std::shared_ptr<TCPConnection>;
 	}
 }

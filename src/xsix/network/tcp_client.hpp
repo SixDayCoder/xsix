@@ -18,7 +18,7 @@ namespace xsix
 		public:
 
 			TCPClient(asio::io_context& ctx) :
-				xsix::net::TCPConnection(ctx),
+				xsix::net::TCPConnection(ctx, nullptr),
 				m_quit(false) {}
 
 			virtual ~TCPClient()

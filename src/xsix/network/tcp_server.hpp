@@ -3,6 +3,8 @@
 #include "xsix/common_define.h"
 #include "xsix/noncopyable.h"
 
+#include "tcp_base_interface.hpp"
+
 #include "asio.hpp"
 
 namespace xsix
@@ -10,7 +12,7 @@ namespace xsix
 	namespace net
 	{
 		template<typename ConnectionT>
-		class TCPServer : public xsix::INonCopyable
+		class TCPServer : public ITCPConnectionParent
 		{
 		public:
 
@@ -19,6 +21,7 @@ namespace xsix
 		public:
 
 			TCPServer(asio::io_context& ctx, uint16_t port) :
+				ITCPConnectionParent(),
 				m_io_context(ctx),
 				m_listen_ep(asio::ip::tcp::v4(), port),
 				m_tcp_acceptor(ctx, m_listen_ep),
@@ -31,8 +34,6 @@ namespace xsix
 		public:
 
 			asio::io_context& get_context() { return m_io_context; }
-
-		public:
 
 			void start()
 			{
@@ -82,6 +83,10 @@ namespace xsix
 
 		public:
 
+			virtual void broadcast(const char* msg, std::size_t msgsize) {}
+
+		protected:
+
 			virtual void handle_accept_new_connection(ConnectionPtr connptr)
 			{
 				if (connptr)
@@ -90,7 +95,6 @@ namespace xsix
 					connptr->start();
 				}
 			}
-
 			virtual void handle_remove_connection(ConnectionPtr connptr)
 			{
 				if (connptr)
@@ -103,7 +107,8 @@ namespace xsix
 
 			ConnectionPtr create_new_connection()
 			{
-				ConnectionPtr connptr(new ConnectionT(m_io_context));
+				ITCPConnectionParent* parent = dynamic_cast<ITCPConnectionParent*>(this);
+				ConnectionPtr connptr(new ConnectionT(m_io_context, parent));
 				return connptr;
 			}
 
@@ -127,7 +132,16 @@ namespace xsix
 
 		private:
 
-			void add_conn(ConnectionPtr connptr)
+			ConnectionPtr get_conn(int32_t connid)
+			{
+				auto it = m_tcp_conn_map.find(connid);
+				if (it != m_tcp_conn_map.end())
+				{
+					return it->second;
+				}
+				return nullptr;
+			}
+			void  add_conn(ConnectionPtr connptr)
 			{
 				if (connptr)
 				{
@@ -140,8 +154,7 @@ namespace xsix
 					m_tcp_conn_map.insert(std::make_pair(connptr->get_id(), connptr));
 				}
 			}
-
-			void remove_conn(int32_t connid)
+			void  remove_conn(int32_t connid)
 			{
 				auto it = m_tcp_conn_map.find(connid);
 				if (it != m_tcp_conn_map.end())
@@ -149,17 +162,7 @@ namespace xsix
 					m_tcp_conn_map.erase(it);
 				}
 			}
-
-			ConnectionPtr get_conn(int32_t connid)
-			{
-				auto it = m_tcp_conn_map.find(connid);
-				if (it != m_tcp_conn_map.end())
-				{
-					return it->second;
-				}
-				return nullptr;
-			}
-
+		
 		private:
 
 			std::atomic<bool>		m_quit;

@@ -3,12 +3,14 @@
 #include "xsix/network/tcp_server.hpp"
 #include "xsix/thread_safe_list.hpp"
 
+class ChatRoomServer;
+
 class Connection : public xsix::net::TCPConnection
 {
 public:
 
-	Connection(asio::io_context& ctx) : 
-		xsix::net::TCPConnection(ctx)
+	Connection(asio::io_context& ctx, xsix::net::ITCPConnectionParent* parent) :
+		xsix::net::TCPConnection(ctx, parent)
 		{}
 
 public:
@@ -17,6 +19,28 @@ public:
 	{
 		read_header();
 	}
+
+	virtual void handle_message() override
+	{
+		uint16_t real_content_size = ntohs(m_tmp_msg.header.contentsize);
+		std::string recv_real_msg(&m_tmp_msg.content[0], real_content_size);
+
+		char buf[4096] = { 0 };
+		int32_t sendbacksize = snprintf(buf, 4096, "guest(%d):%s", get_id(), recv_real_msg.c_str());
+		broadcast(buf, sendbacksize);
+	}
+
+	virtual void handle_error(const asio::error_code& ec) override
+	{
+		xsix::net::TCPConnection::handle_error(ec);
+		if (ec == asio::error::eof ||
+			ec == asio::error::connection_reset)
+		{
+			std::cout << "[Connection] client closed : " << get_id() << std::endl;
+		}
+	}
+
+private:
 
 	void read_header()
 	{
@@ -58,30 +82,6 @@ public:
 		);
 	}
 
-	virtual void handle_message() override
-	{
-		uint16_t real_content_size = ntohs(m_tmp_msg.header.contentsize);
-		std::string msg(&m_tmp_msg.content[0], real_content_size);
-
-		chat_room_msg sendbackmsg = build_sendback_msg(msg);
-		send_msg_to_client(sendbackmsg);
-	}
-
-	void send_msg_to_client(const chat_room_msg& msg)
-	{
-		bool iswriting = !m_send_queue.empty();
-		m_send_queue.push_back(msg);
-		if (!iswriting)
-		{
-			do_write();
-		}
-	}
-
-	void broadcast_msg_to_client(const chat_room_msg& msg)
-	{
-		//m_chatroom.broadcast(msg);
-	}
-
 	void do_write()
 	{
 		chat_room_msg sendbackmsg = m_send_queue.front();
@@ -102,26 +102,23 @@ public:
 		);
 	}
 
-	chat_room_msg build_sendback_msg(const std::string& msg)
-	{
-		char buf[4096] = { 0 };
-		int32_t sendbacksize = snprintf(buf, 4096, "guest(%d):%s", get_id(), msg.c_str());
-		chat_room_msg sendbackmsg;
-		sendbackmsg.set_content(buf, sendbacksize);
-		return sendbackmsg;
-	}
+public:
 
-	virtual void handle_error(const asio::error_code& ec) override
+	void send_msg_to_client(const char* msg, int32_t msgsize)
 	{
-		xsix::net::TCPConnection::handle_error(ec);
-		if (ec == asio::error::eof ||
-			ec == asio::error::connection_reset)
+		chat_room_msg sendbackmsg;
+		sendbackmsg.set_content(msg, msgsize);
+
+		bool iswriting = !m_send_queue.empty();
+		m_send_queue.push_back(sendbackmsg);
+		if (!iswriting)
 		{
-			std::cout << "[Connection] client closed : " << get_id() << std::endl;
+			do_write();
 		}
 	}
 
 private:
+
 	chat_room_msg	m_tmp_msg;
 	xsix::ThreadSafeList<chat_room_msg> m_send_queue;
 };
@@ -137,18 +134,19 @@ public:
 
 public:
 
-	void broadcast(const chat_room_msg& msg)
+	virtual void broadcast(const char* msg, std::size_t size) override
 	{
-		for (auto it = m_tcp_conn_map.begin(); it != m_tcp_conn_map.end(); ++it)
+		for (auto it = m_tcp_conn_map.begin(); 
+				  it != m_tcp_conn_map.end(); ++it)
 		{
-			if (it->second->is_valid())
+			if (it->second)
 			{
-				it->second->send_msg_to_client(msg);
+				it->second->send_msg_to_client(msg, size);
 			}
 		}
 	}
-
-public:
+	
+protected:
 
 	virtual void handle_accept_new_connection(ConnectionPtr connptr) override
 	{

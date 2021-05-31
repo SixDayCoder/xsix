@@ -2,12 +2,14 @@
 #include "xsix/network/tcp_connection.hpp"
 #include "xsix/network/tcp_server.hpp"
 
+class EchoServer;
+
 class Connection : public xsix::net::TCPConnection
 {
 public:
 
-	Connection(asio::io_context& ctx) : 
-		xsix::net::TCPConnection(ctx)
+	Connection(asio::io_context& ctx, xsix::net::ITCPConnectionParent* parent) : 
+		xsix::net::TCPConnection(ctx, parent)
 	{}
 
 public:
