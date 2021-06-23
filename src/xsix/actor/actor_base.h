@@ -47,15 +47,22 @@ namespace xsix
 
 		virtual void init();
 
+	public:
+
+		bool ready_tick(int64_t ts);
+
+	public:
+
+		void addmsg(ActorMsgPtr msgptr);
+
 	private:
 
 		void handle_all_msg();
 
 	public:
 
-		int64_t get_last_tick_timestamp() const { return int64_t(m_last_tick_timestamp.load()); }
-
-		void	set_last_tick_timestamp(int64_t ts) { m_last_tick_timestamp.store(ts); }
+		int64_t get_last_tick_timestamp() const { return m_last_tick_timestamp; }
+		void	set_last_tick_timestamp(int64_t ts) { m_last_tick_timestamp = ts; }
 
 	private:
 
@@ -65,6 +72,6 @@ namespace xsix
 		std::mutex				 m_msg_vec_mutex;
 		std::vector<ActorMsgPtr> m_msg_vec;
 
-		std::atomic_int_fast64_t m_last_tick_timestamp;
+		int64_t					 m_last_tick_timestamp;
 	};
 }

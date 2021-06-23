@@ -18,6 +18,28 @@ namespace xsix
 		set_state(STATE_READY_TICK);
 	}
 
+	bool ActorBase::ready_tick(int64_t ts)
+	{
+		if (get_state() != STATE_READY_TICK) 
+		{
+			return false;
+		}
+
+		auto interval = ts - get_last_tick_timestamp();
+		if (interval < get_tick_interval())
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	void ActorBase::addmsg(ActorMsgPtr msgptr)
+	{
+		std::lock_guard<std::mutex> lock(m_msg_vec_mutex);
+		m_msg_vec.push_back(msgptr);
+	}
+
 	void ActorBase::handle_all_msg()
 	{
 		std::vector<ActorMsgPtr> msglist;
@@ -35,13 +57,6 @@ namespace xsix
 				handle_count++;
 			}
 		}
-
-		//printf("actor id : %d, total msg count : %d, handle count : %d, timestamp : %lld\n",
-		//	get_id(),
-		//	msglist.size(),
-		//	handle_count,
-		//	Timestamp::now().unixmills()
-		//);
 	}
 
 }
